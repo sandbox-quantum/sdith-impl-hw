@@ -29,9 +29,9 @@ module mat_vec_mul_tb #(
     parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
     parameter MAT_COL_SIZE = MAT_COL_SIZE_BYTES*8,
     parameter VEC_SIZE = VEC_SIZE_BYTES*8,
-    parameter N_GF = 2, 
+    parameter N_GF = 4, 
     
-    parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE,
+    parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
     parameter PROC_SIZE = N_GF*8
 )
 (
@@ -53,6 +53,12 @@ wire o_done;
 
 
 mat_vec_mul
+#(
+.MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
+.MAT_COL_SIZE_BYTES(MAT_COL_SIZE_BYTES),
+.VEC_SIZE_BYTES(VEC_SIZE_BYTES),
+.N_GF(N_GF)
+)
 DUT
 (
     .i_clk(i_clk),
@@ -86,5 +92,31 @@ DUT
  end
  
  always #5 i_clk = ~i_clk;
+ 
+// input wire                     clock,
+//    input wire [WIDTH-1:0]         data,
+//    input wire [`CLOG2(DEPTH)-1:0] address,
+//    input wire                     wr_en,
+//    output reg [WIDTH-1:0]         q
+ 
+ mem_single #(.WIDTH(PROC_SIZE), .DEPTH(VEC_SIZE/PROC_SIZE), .FILE("IN_VECTOR_32.mem")) 
+ VECTOR
+ (
+ .clock(i_clk),
+ .data(0),
+ .address(o_vec_addr),
+ .wr_en(0),
+ .q(i_vec)
+ );
+ 
+  mem_single #(.WIDTH(PROC_SIZE), .DEPTH(MAT_SIZE/PROC_SIZE), .FILE("IN_MATRIX_32.mem")) 
+ MATRIX
+ (
+ .clock(i_clk),
+ .data(0),
+ .address(o_mat_addr),
+ .wr_en(0),
+ .q(i_mat)
+ );
  
 endmodule
