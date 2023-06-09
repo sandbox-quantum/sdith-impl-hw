@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mat_vec_mul_tb #(
+module mat_sparvec_mul_tb #(
     
-    parameter PARAMETER_SET = "TOY",
+    parameter PARAMETER_SET = "L3",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
                                    (PARAMETER_SET == "L2")? 159:
                                    (PARAMETER_SET == "L3")? 202:
@@ -37,11 +37,15 @@ module mat_vec_mul_tb #(
                                (PARAMETER_SET == "L3")? 278:
                                                         8,
     
+    parameter VEC_WEIGHT = (PARAMETER_SET == "L1")? 79:
+                           (PARAMETER_SET == "L2")? 120:
+                           (PARAMETER_SET == "L3")? 150:
+                                                     3,
     
     parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
     parameter MAT_COL_SIZE = MAT_COL_SIZE_BYTES*8,
     parameter VEC_SIZE = VEC_SIZE_BYTES*8,
-    parameter N_GF = 2, 
+    parameter N_GF = 8, 
     
     parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
     parameter PROC_SIZE = N_GF*8
@@ -54,22 +58,22 @@ reg i_clk = 0;
 reg i_rst = 0;
 reg i_start = 0;
 reg i_res_en = 0;
-
 wire [`CLOG2(MAT_SIZE/PROC_SIZE)-1:0] o_mat_addr;
 wire [`CLOG2(VEC_SIZE/PROC_SIZE)-1:0] o_vec_addr;
 
 wire [PROC_SIZE-1:0] i_mat;
-wire [PROC_SIZE-1:0] i_vec;
+wire [`CLOG2(VEC_SIZE_BYTES)+8-1:0] i_vec;
 wire [PROC_SIZE-1:0] o_res;
 wire [`CLOG2(VEC_SIZE/PROC_SIZE)-1:0] i_res_addr;
 wire o_done;
 
 
-mat_vec_mul
+mat_sparvec_mul
 #(
 .MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
 .MAT_COL_SIZE_BYTES(MAT_COL_SIZE_BYTES),
 .VEC_SIZE_BYTES(VEC_SIZE_BYTES),
+.VEC_WEIGHT(VEC_WEIGHT),
 .N_GF(N_GF)
 )
 DUT
@@ -116,7 +120,7 @@ DUT
 //    input wire                     wr_en,
 //    output reg [WIDTH-1:0]         q
  
- mem_single #(.WIDTH(PROC_SIZE), .DEPTH(VEC_SIZE/PROC_SIZE), .FILE("IN_VECTOR_16.mem")) 
+ mem_single #(.WIDTH(8+`CLOG2(VEC_SIZE_BYTES)), .DEPTH(VEC_WEIGHT), .FILE("SPARSE_VECTOR.mem")) 
  VECTOR
  (
  .clock(i_clk),
