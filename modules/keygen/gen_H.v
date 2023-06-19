@@ -10,7 +10,7 @@
 module gen_H
 #(
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L3",
     
     parameter SEED_SIZE =   (PARAMETER_SET == "L1")? 128:256,
                                                     
@@ -30,7 +30,7 @@ module gen_H
     parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
     parameter MAT_COL_SIZE = MAT_COL_SIZE_BYTES*8,
 
-    parameter N_GF = 16, 
+    parameter N_GF = 8, 
     
     parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
     parameter PROC_SIZE = N_GF*8,

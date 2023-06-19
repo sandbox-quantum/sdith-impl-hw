@@ -10,7 +10,7 @@
 module gen_H_tb
 #(
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L3",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
                                    (PARAMETER_SET == "L2")? 159:
                                    (PARAMETER_SET == "L3")? 202:
