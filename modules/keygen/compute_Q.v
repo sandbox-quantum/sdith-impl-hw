@@ -10,7 +10,7 @@
 module compute_Q
 #(
 
-    parameter PARAMETER_SET = "L3",
+    parameter PARAMETER_SET = "L1",
     
                                                     
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:

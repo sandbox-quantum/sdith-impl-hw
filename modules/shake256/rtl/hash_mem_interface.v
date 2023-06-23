@@ -49,6 +49,7 @@ module hash_mem_interface
 
                 
                 input     wire                                                i_start,
+                input     wire                                                i_force_done,
                 output    wire                                                o_done
                   
     );    
@@ -107,7 +108,7 @@ endgenerate
     .dout_valid(shake_dout_valid),
     .dout_ready(shake_dout_ready),
     .dout(shake_dout_scram),
-    .force_done(0)
+    .force_done(i_force_done)
     );
 
  reg [2:0] h_state              =   0;

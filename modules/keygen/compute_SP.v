@@ -255,7 +255,7 @@ assign o_sp = s_q_1;
 
 parameter s_wait_start      = 0;
 parameter s_check_i         = 1;
-parameter s_stall_0         = 2;
+// parameter s_stall_0         = 2;
 parameter s_load            = 3;
 parameter s_done            = 4;
 
@@ -300,14 +300,14 @@ begin
             end
         end
         
-        else if (state == s_stall_0) begin
-                if (i == M/D) begin
-                    state <= s_done;
-                end
-                else begin
-                    state <= s_check_i;
-                end
-        end
+        // else if (state == s_stall_0) begin
+        //         if (i == M/D) begin
+        //             state <= s_done;
+        //         end
+        //         else begin
+        //             state <= s_check_i;
+        //         end
+        // end
 
         else if (state == s_load) begin
             if (f_poly_addr == 0) begin
@@ -334,7 +334,7 @@ begin
     end
 end
 
-always@(state, i_start, f_poly_addr)
+always@(state, i_start, f_poly_addr, i)
 begin
 
     case(state)
@@ -355,19 +355,19 @@ begin
        
     end
 
-    s_stall_0: begin
-        // if (i <= 1) begin
-        //     first <= 1;
-        //     o_x_rd <= 1;
-        //     start_ts_mul <= 1;
-        // end
-        // else begin
-            first <= 0;
-            o_x_rd <= 0;
-            start_ts_mul <= 0;
-            o_q_fp_rd <= 1;
-        // end
-    end
+    // s_stall_0: begin
+    //     // if (i <= 1) begin
+    //     //     first <= 1;
+    //     //     o_x_rd <= 1;
+    //     //     start_ts_mul <= 1;
+    //     // end
+    //     // else begin
+    //         first <= 0;
+    //         o_x_rd <= 0;
+    //         start_ts_mul <= 0;
+    //         o_q_fp_rd <= 1;
+    //     // end
+    // end
     
     s_check_i: begin
         o_q_fp_rd <= 1;

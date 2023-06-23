@@ -35,7 +35,7 @@ module hash_mem_interface_tb  #(
 reg                                       clk = 0;
 reg                                       rst;
 wire [IO_WIDTH-1:0]                       i_data_in;
-reg                                       o_data_out_ready = 1;
+reg                                       i_data_out_ready = 1;
 reg  [IO_WIDTH-1:0]                       i_output_length;
 reg  [IO_WIDTH-1:0]                       i_input_length;
 reg                                       i_start;
@@ -57,7 +57,7 @@ wire                                      o_done;
     .rst(rst),
         
     .i_data_in(i_data_in),
-    .o_data_out_ready(o_data_out_ready),
+    .i_data_out_ready(i_data_out_ready),
     .i_input_length(i_input_length),
     .i_output_length(i_output_length),
     .i_start(i_start),
