@@ -14,13 +14,13 @@ module compute_Q_tb
     
                                                     
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
-                        (PARAMETER_SET == "L2")? 120:
-                        (PARAMETER_SET == "L3")? 150:
+                        (PARAMETER_SET == "L3")? 120:
+                        (PARAMETER_SET == "L5")? 150:
                                                  32,
                                                             
     parameter D =   (PARAMETER_SET == "L1")? 1:
-                    (PARAMETER_SET == "L2")? 2:
                     (PARAMETER_SET == "L3")? 2:
+                    (PARAMETER_SET == "L5")? 2:
                                             1,
     parameter DEPTH_OF_Q = WEIGHT/D 
     

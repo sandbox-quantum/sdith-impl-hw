@@ -97,10 +97,13 @@ data_path data_path_instance (
   .mux256(mux256)
 );
 
+reg force_done_ack_reg;
+reg force_done_ack_reg_reg;
 
 always@(posedge clk)
 begin
-    force_done_ack <= force_done;
+    force_done_ack_reg <= force_done;
+    force_done_ack <= force_done_ack_reg;
 end
 
 endmodule

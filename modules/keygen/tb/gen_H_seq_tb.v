@@ -7,7 +7,7 @@
 */
 
 
-module gen_H_tb
+module gen_H_seq_tb
 #(
 
     parameter PARAMETER_SET = "L3",
@@ -25,7 +25,8 @@ module gen_H_tb
                             (PARAMETER_SET == "L3")? 192:
                             (PARAMETER_SET == "L5")? 256:
                                                      128,
-
+    parameter N_GF = 8, 
+    
     parameter MAT_SIZE_BYTES = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES,
     
     parameter PROC_SIZE = N_GF*8,
@@ -36,13 +37,19 @@ module gen_H_tb
     parameter MAT_ROW_SIZE = MRAS_BITS + (PROC_SIZE - MRAS_BITS%PROC_SIZE)%PROC_SIZE,
     parameter MAT_COL_SIZE = MRCS_BITS + (PROC_SIZE - MRCS_BITS%PROC_SIZE)%PROC_SIZE,
 
-    parameter N_GF = 8, 
-    
-    parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE/8,
     
     
-    parameter COL_SIZE_MEM = MAT_COL_SIZE_BYTES/N_GF,
-    parameter ROW_SIZE_MEM = MAT_ROW_SIZE_BYTES/N_GF
+    // parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE,
+    parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE_BYTES,
+    
+    parameter MS = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
+    parameter SHAKE_SQUEEZE = MS + (32-MS%32)%32,
+
+    parameter SEED_FILE = (PARAMETER_SET == "L1")? "SEED_H.mem":
+                          (PARAMETER_SET == "L3")? "SEED_H_L3.mem":
+                          (PARAMETER_SET == "L5")? "SEED_H_L5.mem":
+                                                   "SEED_H.mem"
+
     
     
 )(
@@ -73,7 +80,7 @@ wire [PROC_SIZE-1:0] o_h_out;
 wire          o_done;
 wire          prng_rd;
 
-gen_H #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF), .FILE("SEED_H.mem"))
+gen_H_seq #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF), .SEED_FILE(SEED_FILE))
 H_Matrix_Gen 
 (
 .i_clk(i_clk),      
@@ -141,7 +148,8 @@ hash_mem_interface #(.PARAMETER_SET(PARAMETER_SET), .IO_WIDTH(32), .MAX_RAM_DEPT
     .i_data_in(o_seed_h_prng),
     
     .i_input_length(SEED_SIZE),
-    .i_output_length(MAT_COL_SIZE_BYTES*MAT_ROW_SIZE_BYTES*8),
+//    .i_output_length(MAT_COL_SIZE_BYTES*MAT_ROW_SIZE_BYTES*8),
+    .i_output_length(SHAKE_SQUEEZE),
     .i_start(o_start_prng),
     
     .o_rd_en(prng_rd),

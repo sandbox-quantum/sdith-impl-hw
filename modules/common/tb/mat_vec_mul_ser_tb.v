@@ -20,26 +20,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mat_sparvec_mul_tb #(
+module mat_vec_mul_ser_tb #(
     
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L5",
+
+    parameter M =  (PARAMETER_SET == "L1")? 230:
+                    (PARAMETER_SET == "L3")? 352:
+                    (PARAMETER_SET == "L5")? 480:
+                                             230,
+
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
-                                   (PARAMETER_SET == "L2")? 159:
-                                   (PARAMETER_SET == "L3")? 202:
+                                   (PARAMETER_SET == "L3")? 159:
+                                   (PARAMETER_SET == "L5")? 202:
                                                             8,
                                                             
     parameter MAT_COL_SIZE_BYTES  =(PARAMETER_SET == "L1")? 126:
-                                   (PARAMETER_SET == "L2")? 193:
-                                   (PARAMETER_SET == "L3")? 278:
+                                   (PARAMETER_SET == "L3")? 193:
+                                   (PARAMETER_SET == "L5")? 278:
                                                             8,
     parameter VEC_SIZE_BYTES = (PARAMETER_SET == "L1")? 126:
-                               (PARAMETER_SET == "L2")? 193:
-                               (PARAMETER_SET == "L3")? 278:
+                               (PARAMETER_SET == "L3")? 193:
+                               (PARAMETER_SET == "L5")? 278:
                                                         8,
     
     parameter VEC_WEIGHT = (PARAMETER_SET == "L1")? 126:
-                           (PARAMETER_SET == "L2")? 193:
-                           (PARAMETER_SET == "L3")? 278:
+                           (PARAMETER_SET == "L3")? 193:
+                           (PARAMETER_SET == "L5")? 278:
                                                      8,
     
     parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
@@ -59,17 +65,18 @@ reg i_rst = 0;
 reg i_start = 0;
 reg i_res_en = 0;
 wire [`CLOG2(MAT_SIZE/PROC_SIZE)-1:0] o_mat_addr;
-wire [`CLOG2(VEC_SIZE/PROC_SIZE)-1:0] o_vec_addr;
+wire [`CLOG2(M)-1:0] o_vec_addr;
 
 wire [PROC_SIZE-1:0] i_mat;
-wire [`CLOG2(VEC_SIZE_BYTES)+8-1:0] i_vec;
+wire [8-1:0] i_vec;
 wire [PROC_SIZE-1:0] o_res;
 wire [`CLOG2(VEC_SIZE/PROC_SIZE)-1:0] i_res_addr;
 wire o_done;
+reg i_vec_add_wen = 0;
 
-
-mat_sparvec_mul
+mat_vec_mul_ser
 #(
+.PARAMETER_SET(PARAMETER_SET),
 .MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
 .MAT_COL_SIZE_BYTES(MAT_COL_SIZE_BYTES),
 .VEC_SIZE_BYTES(VEC_SIZE_BYTES),
@@ -88,6 +95,7 @@ DUT
     .o_res(o_res),
     .i_res_en(i_res_en),
     .i_res_addr(i_res_addr),
+    .i_vec_add_wen(i_vec_add_wen),
     .o_done(o_done)
 );
  
@@ -120,7 +128,7 @@ DUT
 //    input wire                     wr_en,
 //    output reg [WIDTH-1:0]         q
  
- mem_single #(.WIDTH(8+`CLOG2(VEC_SIZE_BYTES)), .DEPTH(VEC_WEIGHT), .FILE("SPARSE_VECTOR.mem")) 
+ mem_single #(.WIDTH(8), .DEPTH(M), .FILE("S_L1.mem")) 
  VECTOR
  (
  .clock(i_clk),

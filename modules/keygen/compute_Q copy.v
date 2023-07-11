@@ -10,7 +10,7 @@
 module compute_Q
 #(
 
-    parameter PARAMETER_SET = "L5",
+    parameter PARAMETER_SET = "L1",
     
                                                     
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
@@ -60,13 +60,13 @@ assign data_0 = init ? 1 :
                      0; 
                     //  (mul_out_reg ^ mul_out); 
 
-// assign data_1 = init? i_non_zero_pos: 
-//                 ((m0_addr_1 == 0 && (~sel_mem)) || (m1_addr_1 == 0 && sel_mem))?  mul_out: 
-//                 (q_0 ^ mul_out);
-
 assign data_1 = init? i_non_zero_pos: 
-                ((m0_addr_1 == 0 && (~sel_mem_reg)) || (m1_addr_1 == 0 && sel_mem_reg))?  mul_out: 
-                (q_0_reg ^ mul_out);
+                ((m0_addr_1 == 0 && (~sel_mem)) || (m1_addr_1 == 0 && sel_mem))?  mul_out: 
+                (q_0 ^ mul_out);
+
+// assign data_1 = init? i_non_zero_pos: 
+//                 ((m0_addr_1 == 0 && (~sel_mem_reg)) || (m1_addr_1 == 0 && sel_mem_reg))?  mul_out: 
+//                 (q_0_reg ^ mul_out);
 
                 // (q_0 + mul_out)%251;
 
@@ -110,7 +110,7 @@ REG_STATE_M0_ADDR
 
 wire [`CLOG2(DEPTH_OF_Q):0] m1_addr_1_reg; 
 wire [`CLOG2(DEPTH_OF_Q):0] addr_j_reg_reg; 
-pipeline_reg_gen #(.WIDTH(`CLOG2(DEPTH_OF_Q)+1), .REG_STAGES(2))
+pipeline_reg_gen #(.WIDTH(8), .REG_STAGES(2))
 REG_STATE_M1_ADDR
 (
     .i_clk(i_clk),
@@ -118,10 +118,8 @@ REG_STATE_M1_ADDR
     .o_data_out(addr_j_reg_reg)
    );
 
-
-
 wire sel_mem_reg; 
-pipeline_reg_gen #(.WIDTH(1), .REG_STAGES(3))
+pipeline_reg_gen #(.WIDTH(1), .REG_STAGES(2))
 REG_STATE_SEL_MEM
 (
     .i_clk(i_clk),
@@ -154,8 +152,8 @@ assign q_1 = sel_mem? m0_q_1: m1_q_1;
 assign mul_in_1 = update_addr_zero? mul_out_reg: q_1;
 assign mul_in_2 = i_non_zero_pos;
 
-// gf_mul #(.REG_IN(0), .REG_OUT(0))
-gf_mul #(.REG_IN(1), .REG_OUT(1))
+gf_mul #(.REG_IN(0), .REG_OUT(0))
+// gf_mul #(.REG_IN(1), .REG_OUT(1))
     GF_MULT 
     (
         .clk(i_clk), 
@@ -178,10 +176,9 @@ wire m0_wren_0, m0_wren_1;
 wire [8-1:0] m0_q_0;
 wire [8-1:0] m0_q_1;
 wire sel_mem;
-wire not_sel_mem_reg;
+wire not_sel_mem;
 
-assign not_sel_mem_reg = ~sel_mem_reg;
-assign not_sel_mem = ~sel_mem;
+assign not_sel_mem = ~sel_mem_reg;
 
 assign sel_mem = o_non_zero_pos_addr[0];
 
@@ -190,14 +187,14 @@ assign m0_addr_0 =  i_q_rd ? i_q_addr:
                             addr_j-1;
 assign m0_addr_1 =  init ? addr_i : 
                     update_addr_zero  ? 0 :
-                    // ~sel_mem? addr_j_reg:
-                    ~sel_mem_reg && m0_wren_1? addr_j_reg_reg:
+                    ~sel_mem? addr_j_reg:
+                    // ~sel_mem_reg? addr_j_reg_reg:
                                     addr_j;
 // assign addr_1 = addr_i;
 assign m0_wren_0 = init? wren_0: (~sel_mem) & wren_0;
 // assign m0_wren_1 = init? wren_1: (~sel_mem_reg) & wren_1_reg;
-// assign m0_wren_1 = init? wren_1: (~sel_mem) & wren_1;
-assign m0_wren_1 = init? wren_1: (~sel_mem_reg) & done_mul;
+assign m0_wren_1 = init? wren_1: (~sel_mem) & wren_1;
+// assign m0_wren_1 = init? wren_1: (~sel_mem_reg) & done_mul;
 
 mem_dual #(.WIDTH(8), .DEPTH(DEPTH_OF_Q+1), .FILE("zero.mem"))
 RESULT_MEM_0 
@@ -223,13 +220,13 @@ assign m1_addr_0 =  i_q_rd ? i_q_addr:
                             addr_j-1;
 assign m1_addr_1 =  init ? addr_i : 
                     update_addr_zero  ? 0 :
-                    // sel_mem ? addr_j_reg:
-                    sel_mem_reg && m1_wren_1? addr_j_reg_reg:
+                    sel_mem ? addr_j_reg:
+                    // sel_mem_reg? addr_j_reg_reg:
                                     addr_j;
 
 assign m1_wren_0 = init? wren_0: (sel_mem) & wren_0;
-// assign m1_wren_1 = init? wren_1: (sel_mem) & wren_1;
-assign m1_wren_1 = init? wren_1: (sel_mem_reg) & done_mul;
+assign m1_wren_1 = init? wren_1: (sel_mem) & wren_1;
+// assign m1_wren_1 = init? wren_1: (sel_mem_reg) & done_mul;
 
 wire [8-1:0] m1_q_0;
 wire [8-1:0] m1_q_1;
@@ -258,8 +255,6 @@ parameter s_q0_update       = 4;
 parameter s_done            = 5;
 parameter s_stall_0         = 6;
 parameter s_update_addr_zero = 7;
-parameter s_stall_2         = 9;
-parameter s_stall_3         = 10;
 
 reg [3:0] state = 0;
 reg [`CLOG2(DEPTH_OF_Q):0] addr_i;
@@ -296,13 +291,10 @@ begin
         end 
 
         else if (state == s_stall_0) begin
-            // state <= s_stall_2;
             state <= s_j_inc;
             addr_i <= addr_i - 1;
             addr_j <= addr_j - 1;
         end 
-
-       
 
             
         else if (state ==  s_i_inc) begin
@@ -313,35 +305,13 @@ begin
                 state <= s_done;
             end
             else begin
-                // state <= s_j_inc;
-                state <= s_stall_1;
+                state <= s_j_inc;
                 o_non_zero_pos_addr <= store_addr_i + 1;
                 addr_i <= store_addr_i + 1;
                 addr_j <= store_addr_i + 2;
             end
 
         end
-            
-        else if (state ==  s_stall_1) begin
-            // state <= s_j_inc;
-            state <= s_stall_2;
-            // o_non_zero_pos_addr <= store_addr_i + 1;
-            // addr_i <= store_addr_i + 1;
-            // addr_j <= store_addr_i + 2;
-            // addr_j <= addr_j - 1;
-        end
-
-        else if (state == s_stall_2) begin
-            state <= s_stall_3;
-            // addr_i <= addr_i - 1;
-            // addr_j <= addr_j - 1;
-        end 
-
-        else if (state == s_stall_3) begin
-            state <= s_j_inc;
-            // addr_i <= addr_i - 1;
-            addr_j <= addr_j - 1;
-        end 
 
         else if (state ==  s_j_inc) begin
             if (addr_j == 1) begin
@@ -360,12 +330,8 @@ begin
 
         else if (state ==  s_update_addr_zero) begin
                 state <= s_i_inc;
-                // state <= s_stall_2;
                 addr_i <= store_addr_i;
-                // o_non_zero_pos_addr <= store_addr_i + 1;
         end
-
-        
 
         else if (state ==  s_done) begin
             state <= s_wait_start;
@@ -435,54 +401,6 @@ begin
         done_int <= 0;
     end
 
-    s_stall_1: begin
-        wren_0 <= 0;
-        if (done_mul) begin
-            wren_1 <= 1;
-        end
-        else begin
-            wren_1 <= 0;
-        end
-        o_non_zero_pos_rd <= 1;
-        init <= 0;
-        start_mul <= 0;
-        sel <= 0;
-        update_addr_zero <= 0;
-        done_int <= 0;
-    end
-
-    s_stall_2: begin
-        wren_0 <= 0;
-        if (done_mul) begin
-            wren_1 <= 1;
-        end
-        else begin
-            wren_1 <= 0;
-        end
-        o_non_zero_pos_rd <= 1;
-        init <= 0;
-        start_mul <= 0;
-        sel <= 0;
-        update_addr_zero <= 0;
-        done_int <= 0;
-    end
-
-    s_stall_3: begin
-        wren_0 <= 0;
-        if (done_mul) begin
-            wren_1 <= 1;
-        end
-        else begin
-            wren_1 <= 0;
-        end
-        o_non_zero_pos_rd <= 1;
-        init <= 0;
-        start_mul <= 0;
-        sel <= 0;
-        update_addr_zero <= 0;
-        done_int <= 0;
-    end
-
     s_j_inc: begin
         wren_0 <= 0;
         if (done_mul) begin
@@ -509,17 +427,6 @@ begin
     s_update_addr_zero: begin
         wren_0 <= 0;
         wren_1 <= 1;
-        o_non_zero_pos_rd <= 1;
-        init <= 0;
-        start_mul <= 1;
-        sel <= 0;
-        update_addr_zero <= 0;
-        done_int <= 0;
-    end
-
-    s_stall_2: begin
-        wren_0 <= 0;
-        wren_1 <= 0;
         o_non_zero_pos_rd <= 1;
         init <= 0;
         start_mul <= 1;

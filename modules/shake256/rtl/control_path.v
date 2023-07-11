@@ -279,20 +279,26 @@ begin: FSM
       
     s_squeeze:
     begin
-      if(((requested_bytes_reg < `PARALLEL_SLICES) && (dout_ready == 1'b1)) || force_done) // added force_done: sanjay
-//      if(((requested_bytes_reg < `PARALLEL_SLICES) && (dout_ready == 1'b1)) || force_done) // added force_done: sanjay
-        // this was the last squeeze
-//        next_state = s_command_header;
-        begin
-        next_state = s_prep_add_squeeze;
-//        next_state = s_process;
-        
+      if (force_done) begin // added force_done logic sanjay
+        next_state = s_command_header;
       end
-      else if((requested_bytes_reg >= `PARALLEL_SLICES) && (counter == max_reads_count_reg) && (dout_ready == 1'b1))
-        // process next squeeze
-        next_state = s_process;
-      else
-        next_state = s_squeeze;
+      else begin 
+        if(((requested_bytes_reg < `PARALLEL_SLICES) && (dout_ready == 1'b1)) || force_done) // added force_done: sanjay
+  //      if(((requested_bytes_reg < `PARALLEL_SLICES) && (dout_ready == 1'b1)) || force_done) // added force_done: sanjay
+          // this was the last squeeze
+  //        
+          begin
+          // next_state = s_command_header;
+          next_state = s_prep_add_squeeze;
+  //        next_state = s_process;
+          
+        end
+        else if((requested_bytes_reg >= `PARALLEL_SLICES) && (counter == max_reads_count_reg) && (dout_ready == 1'b1))
+          // process next squeeze
+          next_state = s_process;
+        else
+          next_state = s_squeeze;
+      end
     end
 
    // Sanjay - Test for extra squeezes

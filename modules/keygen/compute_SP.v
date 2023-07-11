@@ -15,18 +15,18 @@ module compute_SP
     parameter TYPE = "P",
                                                     
     parameter M  =  (PARAMETER_SET == "L1")? 230:
-                    (PARAMETER_SET == "L2")? 352:
-                    (PARAMETER_SET == "L3")? 480:
+                    (PARAMETER_SET == "L3")? 352:
+                    (PARAMETER_SET == "L5")? 480:
                                              8,
 
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
-                        (PARAMETER_SET == "L2")? 120:
-                        (PARAMETER_SET == "L3")? 150:
+                        (PARAMETER_SET == "L3")? 120:
+                        (PARAMETER_SET == "L5")? 150:
                                                     8,
                                                             
     parameter D =   (PARAMETER_SET == "L1")? 1:
-                    (PARAMETER_SET == "L2")? 2:
                     (PARAMETER_SET == "L3")? 2:
+                    (PARAMETER_SET == "L5")? 2:
                                             1,
                                             
     parameter DEPTH_Q_FP = (TYPE == "S")? M/D : WEIGHT/D 
@@ -85,7 +85,12 @@ wire [8-1:0] lj_for_s;
 assign lj_addr = i_reg;
 assign o_x_addr = i_reg;
 
-mem_single #(.WIDTH(8), .DEPTH(M/D), .FILE("leading_coefficients_of_lj_for_S_L1.mem"))
+parameter FILE_lj = (PARAMETER_SET == "L1")? "leading_coefficients_of_lj_for_S_L1.mem":
+                    (PARAMETER_SET == "L3")? "leading_coefficients_of_lj_for_S_L3.mem":
+                    (PARAMETER_SET == "L5")? "leading_coefficients_of_lj_for_S_L5.mem":
+                                             "leading_coefficients_of_lj_for_S_L1.mem";
+
+mem_single #(.WIDTH(8), .DEPTH(M/D), .FILE(FILE_lj))
 LJ_MEM 
 (
   .clock(i_clk),

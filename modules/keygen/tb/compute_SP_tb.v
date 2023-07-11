@@ -12,7 +12,7 @@ module compute_SP_tb
 
     parameter PARAMETER_SET = "L1",
     
-    parameter TYPE = "P",
+    parameter TYPE = "S",
 
     parameter M  =  (PARAMETER_SET == "L1")? 230:
                     (PARAMETER_SET == "L2")? 352:

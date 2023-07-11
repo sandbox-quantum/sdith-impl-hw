@@ -11,7 +11,7 @@
 
 module sampling_tb
  #(
-    parameter PARAMETER_SET = "L",
+    parameter PARAMETER_SET = "L1",
 
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
                         (PARAMETER_SET == "L2")? 120:

@@ -10,26 +10,26 @@
 module seed_wit_expansion_tb
 #(
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L5",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
-                        (PARAMETER_SET == "L2")? 192:
-                        (PARAMETER_SET == "L3")? 256:
+                        (PARAMETER_SET == "L3")? 192:
+                        (PARAMETER_SET == "L5")? 256:
                                                  128,
                                                     
     parameter M =  (PARAMETER_SET == "L1")? 230:
-                        (PARAMETER_SET == "L2")? 352:
-                        (PARAMETER_SET == "L3")? 480:
+                        (PARAMETER_SET == "L3")? 352:
+                        (PARAMETER_SET == "L5")? 480:
                                                  230,
 
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
-                        (PARAMETER_SET == "L2")? 120:
-                        (PARAMETER_SET == "L3")? 150:
+                        (PARAMETER_SET == "L3")? 120:
+                        (PARAMETER_SET == "L5")? 150:
                                                  79,
 
     parameter D =   (PARAMETER_SET == "L1")? 1:
-                        (PARAMETER_SET == "L2")? 2:
                         (PARAMETER_SET == "L3")? 2:
+                        (PARAMETER_SET == "L5")? 2:
                                                  1
     
     
@@ -66,11 +66,31 @@ reg [`CLOG2(WEIGHT/D)-1:0]       i_val_addr = 0;
 reg                              i_val_rd = 0;
 wire [7:0]                       o_val;
 
-reg [`CLOG2(WEIGHT/D)-1:0]       i_x_addr = 0;
-reg                              i_x_rd = 0;
-wire [7:0]                       o_x;
+reg [`CLOG2(WEIGHT/D)-1:0]       i_x_addr_0 = 0;
+reg                              i_x_rd_0 = 0;
+wire [7:0]                       o_x_0;
 
+reg [`CLOG2(WEIGHT/D)-1:0]       i_x_addr_1 = 0;
+reg                              i_x_rd_1 = 0;
+wire [7:0]                       o_x_1;
 
+`ifdef TWO_SHARES
+    reg [`CLOG2(WEIGHT/D)-1:0]       i_pos_0_addr = 0;
+    reg                              i_pos_0_rd = 0;
+    wire [7:0]                       o_pos_0;
+
+    reg [`CLOG2(WEIGHT/D)-1:0]       i_val_0_addr = 0;
+    reg                              i_val_0_rd = 0;
+    wire [7:0]                       o_val_0;
+
+    reg [`CLOG2(WEIGHT/D)-1:0]       i_x_0_addr_0 = 0;
+    reg                              i_x_0_rd_0 = 0;
+    wire [7:0]                       o_x_0_0;
+
+    reg [`CLOG2(WEIGHT/D)-1:0]       i_x_0_addr_1 = 0;
+    reg                              i_x_0_rd_1 = 0;
+    wire [7:0]                       o_x_0_1;
+`endif
 
 seed_wit_expansion #(.PARAMETER_SET(PARAMETER_SET))
 SEED_WIT_EXP 
@@ -101,15 +121,37 @@ SEED_WIT_EXP
 .i_val_rd               (i_val_rd              ), 
 .o_val                  (o_val                 ), 
 
-.i_x_addr               (i_x_addr               ), 
-.i_x_rd                 (i_x_rd                 ), 
-.o_x                    (o_x                    ), 
+.i_x_addr_0             (i_x_addr_0             ), 
+.i_x_rd_0               (i_x_rd_0               ), 
+.o_x_0                  (o_x_0                  ), 
 
-.o_done_xv(o_done)
+.i_x_addr_1             (i_x_addr_1             ), 
+.i_x_rd_1               (i_x_rd_1               ), 
+.o_x_1                  (o_x_1                  ), 
+
+`ifdef TWO_SHARES
+    .i_pos_0_addr             (i_pos_0_addr            ), 
+    .i_pos_0_rd               (i_pos_0_rd              ), 
+    .o_pos_0                  (o_pos_0                 ), 
+
+    .i_val_0_addr             (i_val_0_addr            ), 
+    .i_val_0_rd               (i_val_0_rd              ), 
+    .o_val_0                  (o_val_0                 ), 
+
+    .i_x_0_addr_0             (i_x_0_addr_0             ), 
+    .i_x_0_rd_0               (i_x_0_rd_0               ), 
+    .o_x_0_0                  (o_x_0_0                  ), 
+
+    .i_x_0_addr_1             (i_x_0_addr_1             ), 
+    .i_x_0_rd_1               (i_x_0_rd_1               ), 
+    .o_x_0_1                  (o_x_0_1                  ), 
+`endif
+
+.o_done_xv              (o_done                 )
 );
 
 
-hash_mem_interface #(.IO_WIDTH(32), .MAX_RAM_DEPTH(LAMBDA/32))
+hash_mem_interface #(.IO_WIDTH(32), .PARAMETER_SET(PARAMETER_SET), .MAX_RAM_DEPTH(LAMBDA/32))
   HASH_INTERFACE
    (
     .clk                (i_clk                   ),
@@ -140,11 +182,11 @@ begin
     i_rst <= 0;
 
     i_seed <= 0;
-    i_seed_wr_en <= 1;
-    i_seed_addr <= 0; #10  
-    i_seed_addr <= 1; #10  
-    i_seed_addr <= 2; #10  
-    i_seed_addr <= 3; #10
+//    i_seed_wr_en <= 1;
+//    i_seed_addr <= 0; #10  
+//    i_seed_addr <= 1; #10  
+//    i_seed_addr <= 2; #10  
+//    i_seed_addr <= 3; #10
     i_seed_wr_en <= 0;
 
     
