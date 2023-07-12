@@ -11,6 +11,8 @@
 module vec_add
 #(
 
+    parameter FIELD = "GF256",
+
     parameter PARAMETER_SET = "L1",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
                                    (PARAMETER_SET == "L3")? 159:
@@ -80,7 +82,38 @@ wire [PROC_SIZE-1:0] s_vec_mux;
 assign s_vec_mux = (o_res_addr == MAT_ROW_SIZE/PROC_SIZE)? {s_vec[PROC_SIZE-PAD_BITS-1:0],{(PAD_BITS){1'b0}}} : s_vec;
 
 // assign o_res = (o_res_addr == MAT_ROW_SIZE/PROC_SIZE)? i_vec ^ {s_vec[PROC_SIZE-PAD_BITS-1:0],{(PAD_BITS){1'b0}}} :i_vec ^ s_vec;
-assign o_res = i_vec ^ s_vec_mux;
+// assign o_res = i_vec ^ s_vec_mux;
+
+
+genvar j;
+generate
+    for(j=0;j<N_GF;j=j+1) begin
+        if (FIELD == "P251") begin 
+            p251_add 
+            P251_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(i_vec[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]), 
+                .in_2(s_vec_mux[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]),
+    //            .done(done_dot_mul[i]), 
+                .out(o_res[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]) 
+            );
+        end
+        else begin 
+            gf_add 
+            GF_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(i_vec[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]), 
+                .in_2(s_vec_mux[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]),
+    //            .done(done_dot_mul[i]), 
+                .out(o_res[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]) 
+            );
+        end
+    end
+endgenerate
 
 parameter s_wait_start      = 0;
 parameter s_stall_0         = 1;

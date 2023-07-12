@@ -20,49 +20,60 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module p251_red_tb(
+module p251_add_tb(
 
     );
     
-reg i_clk = 0;
-reg i_start = 0;
-reg [15:0] i_a;
-wire [7:0] o_c;
-wire o_done;
+reg clk = 0;
+reg start = 0;
+reg [7:0] in_1;
+reg [7:0] in_2;
+wire [7:0] out;
+wire done;
 
 
-p251_mul_red
+p251_add
 DUT
 (
-    .i_clk(i_clk),
-    .i_a(i_a),
-    .i_start(i_start),
-    .o_c(o_c),
-    .o_done(o_done)
+    .i_clk(clk),
+    .in_1(in_1),
+    .in_2(in_2),
+    .i_start(start),
+    .out(out),
+    .o_done(done)
 );
  
  initial
  begin
-     i_start <= 0;
-     i_a <= 0;
+     start <= 0;
+     in_1 <= 0;
+     in_2 <= 0;
      #100
-     i_start <= 1;
-     i_a  <= 251;
+     start <= 1;
+     in_1  <= 1;
+     in_2  <= 20;
      
      #10 
-     i_start <= 0;
-     i_a <= 16476;
+     start <= 1;
+     in_1  <= 234;
+     in_2  <= 31;
      
      #10 
-     i_start <= 0;
-     i_a <= 7218;
+     start <= 1;
+     in_1  <= 240;
+     in_2  <= 85;
+     
+      #10 
+     start <= 1;
+     in_1  <= 245;
+     in_2  <= 165;
+     
      
      #10 
-     i_start <= 0;
-     i_a <= 16'hffff;
+     start <= 0;
  
  end
  
- always #5 i_clk = ~i_clk;
+ always #5 clk = ~clk;
  
 endmodule

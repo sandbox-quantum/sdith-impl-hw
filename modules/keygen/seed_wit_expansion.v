@@ -9,7 +9,8 @@
 
 module seed_wit_expansion 
 #(
-
+    parameter FIELD = "GF256", 
+    
     parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
@@ -672,7 +673,7 @@ begin
         if (count_val <= WEIGHT/D -1) begin 
             if (i_hash_data_out_valid) begin
                 load_hash_in <=1;
-                if (val == 0) begin
+                if (val == 0 || (FIELD == "P251" && val > 250)) begin
                     wr_en_cv <= 0;
                 end
                 else begin
@@ -700,7 +701,7 @@ begin
         start_mv_pos <= 0;
         start_mv_val <= 0;
         if (count_val <= WEIGHT/D -1) begin  
-            if (val == 0) begin
+            if (val == 0 || (FIELD == "P251" && val > 250)) begin
                 wr_en_cv <= 0;
             end
             else begin

@@ -1,5 +1,5 @@
 /*
- * This file is SampleWitness module.
+ * This file is SDitH KeyGen module.
  *
  * Copyright (C) 2023
  * Authors: Sanjay Deshpande <sanjay.deshpande@sandboxquantum.com>
@@ -9,8 +9,10 @@
 
 module keygen 
 #(
+//    parameter FIELD = "GF256",
+    parameter FIELD = "P251",
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L3",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:
@@ -229,7 +231,7 @@ wire done_wit;
 assign seed_wit = i_hash_data_out;
 assign o_s = s_out;
 
-samplewitness #(.PARAMETER_SET(PARAMETER_SET))
+samplewitness #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET))
 SAMP_WIT 
 (
 .i_clk                  (i_clk                      ),
@@ -364,6 +366,7 @@ assign o_y = vec_res;
 
 mat_vec_mul_ser
 #(
+.FIELD(FIELD),
 .PARAMETER_SET(PARAMETER_SET),
 .MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
 .MAT_COL_SIZE_BYTES(MAT_COL_SIZE_BYTES),
@@ -409,6 +412,7 @@ assign s_vec_add = s_out;
 
 vec_add
 #(
+.FIELD(FIELD),
 .PARAMETER_SET(PARAMETER_SET),
 .MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
 .M(M),

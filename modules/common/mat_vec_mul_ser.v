@@ -14,7 +14,10 @@
 
 module mat_vec_mul_ser
 #(
-
+    
+    parameter FIELD = "P251",
+//    parameter FIELD = "GF256",
+    
     parameter PARAMETER_SET = "L3",
     parameter N_GF = 8, 
 
@@ -107,18 +110,69 @@ wire [N_GF-1:0] done_dot_mul;
 genvar i;
 generate
     for(i=0;i<N_GF;i=i+1) begin
-        gf_mul 
-        GF_MULT 
-        (
-            .clk(i_clk), 
-            .start(start_dot_mul), 
-            .in_1(i_mat[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]), 
-            .in_2(i_vec),
-            .done(done_dot_mul[i]), 
-            .out(mul_out[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]) 
-        );
+        if (FIELD == "P251") begin 
+            p251_mul 
+            P251_MULT 
+            (
+                .clk(i_clk), 
+                .start(start_dot_mul), 
+                .in_1(i_mat[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]), 
+                .in_2(i_vec),
+                .done(done_dot_mul[i]), 
+                .out(mul_out[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]) 
+            );
+        end
+        else begin 
+            gf_mul 
+            GF_MULT 
+            (
+                .clk(i_clk), 
+                .start(start_dot_mul), 
+                .in_1(i_mat[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]), 
+                .in_2(i_vec),
+                .done(done_dot_mul[i]), 
+                .out(mul_out[PROC_SIZE-i*8-1 : PROC_SIZE-i*8-8]) 
+            );
+        end
     end
 endgenerate
+
+wire [PROC_SIZE-1:0] add_out;
+// wire add_out_test;
+
+// assign add_out_test = (add_out == (mul_out_reg ^ q_1));
+
+
+genvar j;
+generate
+    for(j=0;j<N_GF;j=j+1) begin
+        if (FIELD == "P251") begin 
+            p251_add 
+            P251_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(mul_out_reg[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]), 
+                .in_2(q_1[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]),
+    //            .done(done_dot_mul[i]), 
+                .out(add_out[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]) 
+            );
+        end
+        else begin 
+            gf_add 
+            GF_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(mul_out_reg[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]), 
+                .in_2(q_1[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]),
+    //            .done(done_dot_mul[i]), 
+                .out(add_out[PROC_SIZE-j*8-1 : PROC_SIZE-j*8-8]) 
+            );
+        end
+    end
+endgenerate
+
 
 
 reg start_addr_0_en; 
@@ -139,9 +193,11 @@ begin
     end
 end
 
-always@(mul_out_reg, q_1)
+// always@(mul_out_reg, q_1)
+always@(add_out)
 begin
-    data_0 <= mul_out_reg ^ q_1;
+//    data_0 <= mul_out_reg ^ q_1;
+    data_0 <= add_out;
 end
 
 always@(posedge i_clk)

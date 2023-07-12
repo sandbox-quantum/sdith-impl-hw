@@ -9,8 +9,9 @@
 
 module keygen_tb
 #(
-
-    parameter PARAMETER_SET = "L1",
+//    parameter FIELD = "GF256",
+    parameter FIELD = "P251",
+    parameter PARAMETER_SET = "L3",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:
@@ -115,7 +116,7 @@ wire                                i_hash_done;
 wire                                i_hash_force_done_ack;
 wire                                o_force_done_ack;
 
-keygen #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF))
+keygen #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF))
 DUT 
 (
 .i_clk(i_clk),

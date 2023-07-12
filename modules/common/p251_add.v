@@ -18,9 +18,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+
+Input: in_1, in_2 and m = floor(2^9/251)+1   //m = 3, 9 represents output width on adding two 8-bit numbers
+Output: c  = (in_1 + in_2) mod 251
+0: a = in_1 + in_2
+1: t <- a*3 >> 9
+2: c <- a - t*251
+3: if (c<0)
+4: 	c <- c+251
+5: end if
+6: return c
+
  *
 */
-module p251_red
+module p251_add
 #(
 //    parameter REG_IN = 1,
 //    parameter REG_OUT = 1
@@ -28,51 +39,27 @@ module p251_red
 (
     input i_clk, // for potential regs we may add later
     input i_start,
-    input [15:0] i_a,
-    output [7:0] o_c,
+    input [7:0] in_1,
+    input [7:0] in_2,
+    output [7:0] out,
     output o_done
     );
   
-wire [15:0] a_reg;  
-wire [15+8:0] a_mul_256;
-wire [15+2:0] a_mul_4;
-wire [15+1:0] a_mul_2;
+wire [8:0] a;
+wire [8+2:0]a_mul_3;
+wire [8+2-9:0]t;
+wire [8:0] c_init; 
+wire [8:0] c_final;
 
-wire [15+8+2:0] a_mul_262;
+assign a = in_1 + in_2;
+assign a_mul_3 = {a,1'b0} + a;
+assign t = a_mul_3[10:9];
+assign c_init = a - ({t,8'h00} - {t,2'b00} - t);
 
-wire [9:0] a_s16;
+assign c_final = (c_init[8] == 1)? c_init + 251 : c_init;
 
-wire [9+8:0] a_s16_mul_256;
-wire [9+2:0] a_s16_mul_4;
-
-wire [9+8:0] a_s16_mul_251;
-
-wire [8:0] c_temp;
-
-//always@(posedge i_clk) 
-//begin
-//     a_reg <= i_a;
-//end
-
-assign a_reg = i_a;
-
-assign a_mul_256 = {a_reg,8'h00};
-assign a_mul_4 = {a_reg,2'b00};
-assign a_mul_2 = {a_reg,1'b0};
-
-assign a_mul_262 = a_mul_256 + a_mul_4 + a_mul_2;
-
-assign a_s16 = a_mul_262[15+8+2:16];
-
-assign a_s16_mul_256 = {a_s16,8'h00};
-assign a_s16_mul_4 = {a_s16,2'b00};
-
-assign a_s16_mul_251 = a_s16_mul_256 - a_s16_mul_4 - a_s16;
-
-assign c_temp = a_reg - a_s16_mul_251;
-
-
-assign o_c = (c_temp[8] == 1)? c_temp + 251 : c_temp;
-    
+assign out = c_final[7:0];
+assign o_done = i_start;
+ 
 endmodule
 

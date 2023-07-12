@@ -22,6 +22,9 @@
 
 module mat_vec_mul_ser_tb #(
     
+    parameter FIELD = "P251",
+//    parameter FIELD = "GF256",
+    
     parameter PARAMETER_SET = "L3",
 
     parameter M =  (PARAMETER_SET == "L1")? 230:
@@ -86,6 +89,7 @@ reg i_vec_add_wen = 0;
 
 mat_vec_mul_ser
 #(
+.FIELD(FIELD),
 .PARAMETER_SET(PARAMETER_SET),
 .MAT_ROW_SIZE_BYTES(MAT_ROW_SIZE_BYTES),
 .MAT_COL_SIZE_BYTES(MAT_COL_SIZE_BYTES),

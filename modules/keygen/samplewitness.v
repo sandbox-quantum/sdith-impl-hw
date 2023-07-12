@@ -9,7 +9,7 @@
 
 module samplewitness 
 #(
-
+    parameter FIELD = "GF256",
     parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
@@ -97,7 +97,7 @@ module samplewitness
 wire done_wit_exp;
 reg start_wit_exp;
 //=============================================
-seed_wit_expansion #(.PARAMETER_SET(PARAMETER_SET), .FILE_SEED(FILE_SEED))
+seed_wit_expansion #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .FILE_SEED(FILE_SEED))
 SEED_WIT_EXP 
 (
 .i_clk                  (i_clk                 ),
