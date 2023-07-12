@@ -66,8 +66,8 @@ module mat_vec_mul_ser
     parameter MAT_ROW_SIZE = MRS_BITS + (PROC_SIZE - MRS_BITS%PROC_SIZE)%PROC_SIZE,
     parameter MAT_COL_SIZE = MCS_BITS + (PROC_SIZE - MCS_BITS%PROC_SIZE)%PROC_SIZE,
 
+
     
-    // parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE,
     parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE_BYTES
     
     

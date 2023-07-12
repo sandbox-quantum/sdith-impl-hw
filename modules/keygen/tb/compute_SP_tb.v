@@ -10,23 +10,23 @@
 module compute_SP_tb
 #(
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L3",
     
     parameter TYPE = "S",
 
     parameter M  =  (PARAMETER_SET == "L1")? 230:
-                    (PARAMETER_SET == "L2")? 352:
-                    (PARAMETER_SET == "L3")? 480:
+                    (PARAMETER_SET == "L3")? 352:
+                    (PARAMETER_SET == "L5")? 480:
                                              8,
 
     parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
-                        (PARAMETER_SET == "L2")? 120:
-                        (PARAMETER_SET == "L3")? 150:
+                        (PARAMETER_SET == "L3")? 120:
+                        (PARAMETER_SET == "L5")? 150:
                                                     8,
                                                             
     parameter D =   (PARAMETER_SET == "L1")? 1:
-                    (PARAMETER_SET == "L2")? 2:
                     (PARAMETER_SET == "L3")? 2:
+                    (PARAMETER_SET == "L5")? 2:
                                             1,
     parameter DEPTH_Q_FP = (TYPE == "S")? M/D : WEIGHT/D 
 
@@ -127,7 +127,7 @@ end
 always #5 i_clk = ! i_clk;
 
 
-mem_single #(.WIDTH(8), .DEPTH(M), .FILE("x_L1.mem")) 
+mem_single #(.WIDTH(8), .DEPTH(M/D), .FILE("X_L3.mem")) 
  X_val
  (
  .clock(i_clk),
@@ -137,7 +137,17 @@ mem_single #(.WIDTH(8), .DEPTH(M), .FILE("x_L1.mem"))
  .q(i_x)
  );
 
-parameter FILE_SQ = (TYPE == "S")? "f_poly_L1.mem" : "Q_L1.mem";
+parameter f_poly = (PARAMETER_SET == "L1")? "f_poly_L1.mem":
+                   (PARAMETER_SET == "L3")? "f_poly_L3.mem":
+                   (PARAMETER_SET == "L5")? "f_poly_L5.mem":
+                                            "f_poly_L1.mem";
+ 
+ parameter Q =      (PARAMETER_SET == "L1")? "Q_L1.mem":
+                   (PARAMETER_SET == "L3")? "f_poly_L3.mem":
+                   (PARAMETER_SET == "L5")? "f_poly_L5.mem":
+                                            "f_poly_L1.mem";                                           
+
+parameter FILE_SQ = (TYPE == "S")? f_poly : Q;
 
 mem_single #(.WIDTH(8), .DEPTH(DEPTH_Q_FP+1), .FILE(FILE_SQ)) 
  Q_val

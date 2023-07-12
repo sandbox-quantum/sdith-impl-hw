@@ -10,7 +10,7 @@
 module keygen_tb
 #(
 
-    parameter PARAMETER_SET = "L3",
+    parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:
@@ -77,6 +77,13 @@ wire  [8-1:0]                       o_s;
 reg   [`CLOG2(M):0]                 i_s_addr;
 reg                                 i_s_rd = 0;
 
+wire  [8-1:0]                       o_q_0;
+reg   [`CLOG2(M):0]                 i_q_0_addr;
+reg                                 i_q_0_rd = 0;
+wire  [8-1:0]                       o_p_0;
+reg   [`CLOG2(M):0]                 i_p_0_addr;
+reg                                 i_p_0_rd = 0;
+
 wire  [31:0]                        o_seed_h;
 reg   [`CLOG2(LAMBDA/32):0]         i_seed_h_addr;
 reg                                 i_seed_h_rd = 0;
@@ -126,6 +133,15 @@ DUT
 .o_s(o_s),
 .i_s_addr(i_s_addr),
 .i_s_rd (i_s_rd ),
+
+`ifdef TWO_SHARES
+.o_q_0                  (o_q_0                      ),
+.i_q_0_addr             (i_q_0_addr                 ),
+.i_q_0_rd               (i_q_0_rd                          ),
+.o_p_0                  (o_p_0                      ),
+.i_p_0_addr             (i_p_0_addr                 ),
+.i_p_0_rd               (i_p_0_rd                         ),
+`endif
 
 .o_seed_h(o_seed_h),
 .i_seed_h_addr(i_seed_h_addr),
@@ -240,8 +256,9 @@ end
  begin
      @(posedge o_done)
      $writememb("HSA_L1.mem", DUT.MAT_VEC_MUL.RESULT_MEM.mem);
-     $writememb("S_L1.mem", DUT.SAMP_WIT.COMP_S.S_MEM.mem);
-     $writememb("H_L1.mem", DUT.H_Matrix_Gen.RESULT_MEM.mem);
+//     $writememb("S_L3.mem", DUT.SAMP_WIT.COMP_S.S_MEM.mem);
+//     $writememb("S_L3.mem", DUT.SAMP_WIT.S_combined_MEM.mem);
+//     $writememb("H_L3.mem", DUT.H_Matrix_Gen.RESULT_MEM.mem);
  end
 
 always #5 i_clk = ! i_clk;

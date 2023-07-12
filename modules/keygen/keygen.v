@@ -95,6 +95,16 @@ module keygen
     input   [`CLOG2(WEIGHT):0]              i_p_addr,
     input                                   i_p_rd,
 
+    `ifdef TWO_SHARES
+        output  [7:0]                           o_q_0,
+        input   [`CLOG2(WEIGHT/D + 1):0]        i_q_0_addr,
+        input                                   i_q_0_rd,
+
+        output  [7:0]                           o_p_0,
+        input   [`CLOG2(WEIGHT/D):0]            i_p_0_addr,
+        input                                   i_p_0_rd,    
+    `endif 
+    
     output [31:0]                           o_seed_h,
     input   [`CLOG2(WEIGHT/D):0]            i_seed_h_addr,
     input                                   i_seed_h_rd,
@@ -242,10 +252,10 @@ SAMP_WIT
 `ifdef TWO_SHARES
 .o_q_0                  (o_q_0                      ),
 .i_q_0_addr             (i_q_0_addr                 ),
-.i_q_0_rd               (0                          ),
+.i_q_0_rd               (i_q_0_rd                   ),
 .o_p_0                  (o_p_0                      ),
 .i_p_0_addr             (i_p_0_addr                 ),
-.i_p_0_rd               (0                          ),
+.i_p_0_rd               (i_p_0_rd                   ),
 `endif 
 
 .o_hash_data_in          (o_hash_data_in_wit       ),   
@@ -541,6 +551,7 @@ begin
         else if (state == s_hsa) begin
             if (done_mat_vec_mul) begin
                 state <= s_sb_plus_hsa;
+                // state <= s_done;
             end
             o_done <= 0;
         end

@@ -22,7 +22,7 @@
 
 module mat_vec_mul_ser_tb #(
     
-    parameter PARAMETER_SET = "L5",
+    parameter PARAMETER_SET = "L3",
 
     parameter M =  (PARAMETER_SET == "L1")? 230:
                     (PARAMETER_SET == "L3")? 352:
@@ -48,13 +48,23 @@ module mat_vec_mul_ser_tb #(
                            (PARAMETER_SET == "L5")? 278:
                                                      8,
     
-    parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
-    parameter MAT_COL_SIZE = MAT_COL_SIZE_BYTES*8,
     parameter VEC_SIZE = VEC_SIZE_BYTES*8,
     parameter N_GF = 8, 
     
-    parameter MAT_SIZE = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
-    parameter PROC_SIZE = N_GF*8
+    parameter MAT_SIZE_BYTES = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES,
+    
+    parameter PROC_SIZE = N_GF*8,
+    
+    parameter MRS_BITS = MAT_ROW_SIZE_BYTES*8,
+    parameter MCS_BITS = MAT_COL_SIZE_BYTES*8,
+    
+    parameter MAT_ROW_SIZE = MRS_BITS + (PROC_SIZE - MRS_BITS%PROC_SIZE)%PROC_SIZE,
+    parameter MAT_COL_SIZE = MCS_BITS + (PROC_SIZE - MCS_BITS%PROC_SIZE)%PROC_SIZE,
+
+
+    
+    parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE_BYTES
+    
 )
 (
 
@@ -128,7 +138,8 @@ DUT
 //    input wire                     wr_en,
 //    output reg [WIDTH-1:0]         q
  
- mem_single #(.WIDTH(8), .DEPTH(M), .FILE("S_L1.mem")) 
+// mem_single #(.WIDTH(8), .DEPTH(M), .FILE("S_L1.mem")) 
+ mem_single #(.WIDTH(8), .DEPTH(M), .FILE("S_L3.mem")) 
  VECTOR
  (
  .clock(i_clk),
@@ -138,7 +149,8 @@ DUT
  .q(i_vec)
  );
  
-  mem_single #(.WIDTH(PROC_SIZE), .DEPTH(MAT_SIZE/PROC_SIZE), .FILE("IN_MATRIX_16.mem")) 
+//  mem_single #(.WIDTH(PROC_SIZE), .DEPTH(MAT_SIZE/PROC_SIZE), .FILE("IN_MATRIX_16.mem")) 
+  mem_single #(.WIDTH(PROC_SIZE), .DEPTH(MAT_SIZE/PROC_SIZE), .FILE("H_L3.mem")) 
  MATRIX
  (
  .clock(i_clk),

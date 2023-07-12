@@ -13,27 +13,27 @@ module vec_add
 
     parameter PARAMETER_SET = "L1",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
-                                   (PARAMETER_SET == "L2")? 159:
-                                   (PARAMETER_SET == "L3")? 202:
+                                   (PARAMETER_SET == "L3")? 159:
+                                   (PARAMETER_SET == "L5")? 202:
                                                             8,
 
     parameter M =   (PARAMETER_SET == "L1")? 230:
-                    (PARAMETER_SET == "L2")? 352:
-                    (PARAMETER_SET == "L3")? 480:
+                    (PARAMETER_SET == "L3")? 352:
+                    (PARAMETER_SET == "L5")? 480:
                                              230,
 
     parameter MAT_ROW_SIZE = MAT_ROW_SIZE_BYTES*8,
 
     
     parameter S_START_ADDR = (PARAMETER_SET == "L1")? 126:
-                            (PARAMETER_SET == "L2")? 120:
-                            (PARAMETER_SET == "L3")? 150:
+                            (PARAMETER_SET == "L3")? 120:
+                            (PARAMETER_SET == "L5")? 150:
                                                      3,
-
+    
     parameter N_GF = 8, 
     
-    parameter PROC_SIZE = N_GF*8
-    
+    parameter PROC_SIZE = N_GF*8,
+    parameter PAD_BITS = (PROC_SIZE - MAT_ROW_SIZE%PROC_SIZE)%PROC_SIZE
     
     
 )(
@@ -75,7 +75,12 @@ always@(posedge i_clk) begin
     o_res_addr <= o_vec_addr;
 end
 
-assign o_res = i_vec ^ s_vec;
+wire [PROC_SIZE-1:0] s_vec_mux;
+
+assign s_vec_mux = (o_res_addr == MAT_ROW_SIZE/PROC_SIZE)? {s_vec[PROC_SIZE-PAD_BITS-1:0],{(PAD_BITS){1'b0}}} : s_vec;
+
+// assign o_res = (o_res_addr == MAT_ROW_SIZE/PROC_SIZE)? i_vec ^ {s_vec[PROC_SIZE-PAD_BITS-1:0],{(PAD_BITS){1'b0}}} :i_vec ^ s_vec;
+assign o_res = i_vec ^ s_vec_mux;
 
 parameter s_wait_start      = 0;
 parameter s_stall_0         = 1;
