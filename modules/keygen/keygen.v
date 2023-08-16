@@ -12,7 +12,7 @@ module keygen
 //    parameter FIELD = "GF256",
     parameter FIELD = "P251",
 
-    parameter PARAMETER_SET = "L3",
+    parameter PARAMETER_SET = "L5",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:
@@ -71,7 +71,7 @@ module keygen
     parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE_BYTES,
     
     parameter MS = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
-    parameter SHAKE_SQUEEZE = MS + (32-MS%32)%32
+    parameter SHAKE_SQUEEZE = 2*(MS + (32-MS%32)%32)
     
     
 
@@ -284,7 +284,7 @@ wire done_gen_h;
 assign seed_h = i_hash_data_out;
 
 //gen_H #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF))
-gen_H_seq #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF))
+gen_H_seq #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF))
 H_Matrix_Gen 
 (
 .i_clk(i_clk),      

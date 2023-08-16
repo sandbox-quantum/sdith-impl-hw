@@ -9,7 +9,7 @@
 
 module gen_H_seq
 #(
-    parameter FIELD = "GF256",
+
     parameter PARAMETER_SET = "L3",
     
     parameter SEED_SIZE =   (PARAMETER_SET == "L1")? 128:
@@ -112,10 +112,7 @@ begin
 end
 
 wire [7:0] byte_in;
-wire [7:0] byte_next;
 assign byte_in = i_prng_out_reg[31:24];
-
-assign byte_next = i_prng_out_reg[23:16];
 
 
 always@(posedge i_clk) begin
@@ -124,6 +121,7 @@ always@(posedge i_clk) begin
     end
 end
 
+// assign data_0 = (count_row_block == MAT_COL_SIZE/PROC_SIZE - 1)? {data_shift_reg[PROC_SIZE-PAD_BITS-1:0], {(PAD_BITS){1'b0}}} : data_shift_reg; 
 assign data_0 = (count_row_block == MAT_ROW_SIZE/PROC_SIZE - 1)? {data_shift_reg[PROC_SIZE-PAD_BITS-1:0], {(PAD_BITS){1'b0}}} : data_shift_reg; 
 
 assign o_h_out = q_1;
@@ -170,7 +168,7 @@ parameter s_done                        = 8;
 
 reg [3:0] state = 0;
 reg [`CLOG2(N_GF):0] vect_shift_count;
-// reg [`CLOG2(N_GF)-1:0] vs_count_tracker;
+reg [`CLOG2(N_GF)-1:0] vs_count_tracker;
 reg [1:0] count;
 reg [`CLOG2(MAT_ROW_SIZE/PROC_SIZE)-1:0] count_row_block;
 reg done_int;
@@ -185,6 +183,7 @@ always@(posedge i_clk) begin
         count_row_block <= 0;
     end
     else if (wren_0) begin
+        // if (count_row_block == MAT_COL_SIZE/PROC_SIZE-1) begin
         if (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1) begin
             count_row_block <= 0;
         end
@@ -196,17 +195,17 @@ end
 wire debug_last;
 assign debug_last = wren_0 & count_row_block == MAT_COL_SIZE/PROC_SIZE-1;
 
-// always@(posedge i_clk)
-// begin
-//     if (i_start) begin
-//         vs_count_tracker <= N_GF - 1;
-//     end
-//     // if (wren_0) begin
-//     //     if ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1)) begin
-//     //         vs_count_tracker <= vs_count_tracker-PAD_BITS/N_GF;
-//     //     end
-//     // end
-// end
+always@(posedge i_clk)
+begin
+    if (i_start) begin
+        vs_count_tracker <= N_GF - 1;
+    end
+    // if (wren_0) begin
+    //     if ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1)) begin
+    //         vs_count_tracker <= vs_count_tracker-PAD_BITS/N_GF;
+    //     end
+    // end
+end
 
 always@(posedge i_clk)
 begin
@@ -235,6 +234,7 @@ begin
         else if (state == s_stall_0) begin
             if (i_prng_out_valid) begin
                 state <= s_stall_1;
+                // state <= s_wait_prng_out;
             end
         end
 
@@ -252,6 +252,9 @@ begin
                count <= 0;
                addr_0 <= 0;
             end
+            // else if (count_row_block == MAT_ROW_SIZE/PROC_SIZE) begin
+            //     state <= s_done;
+            // end
             else begin
                 if (count == 2) begin
                     state <= s_update_shake_reg;
@@ -261,7 +264,9 @@ begin
                     count <= count + 1;
                 end    
                 if (big_shift_reg_en) begin 
+                    // if (vect_shift_count == N_GF-1) begin
                     if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+                    // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
                         vect_shift_count <= 0;
                         addr_0 <= addr_0 + 1;     
                     end
@@ -278,16 +283,23 @@ begin
                 state <= s_done;
                 count <= 0;
             end
+            // else if (count_row_block == MAT_ROW_SIZE/PROC_SIZE) begin
+            //     state <= s_done;
+            // end
             else begin
                 if (i_prng_out_valid) begin
                     state <= s_wait_prng_out;
                     count <= count + 1;
                 end
                 else begin
+                    // state <= s_wait_prng_out_valid;
                     state <= s_finish_storage;
+                    // state <= s_done;
                 end
                 if (big_shift_reg_en) begin 
+                    // if (vect_shift_count == N_GF-1) begin
                     if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+                    // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
                         vect_shift_count <= 0;
                         addr_0 <= addr_0 + 1;
                     end
@@ -300,6 +312,13 @@ begin
 
         else if (state == s_finish_storage) begin
             state <= s_wait_prng_out_valid;
+            // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+            //     vect_shift_count <= 0;
+            //     addr_0 <= addr_0 + 1;
+            // end
+            // if (count == 3) begin
+            //     count <= 0;
+            // end
         end
 
 
@@ -312,6 +331,7 @@ begin
             else begin
                 if (i_prng_out_valid || (addr_0==MAT_SIZE/PROC_SIZE - 1 && (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))))) begin
                     state <= s_stall_2;
+                    // count <= count + 1;
                     if (count == 3) begin
                         count <= 0;
                     end
@@ -326,7 +346,9 @@ begin
                 state <= s_wait_prng_out;
                 count <= count + 1;
                 if (big_shift_reg_en || addr_0==MAT_SIZE/PROC_SIZE - 1) begin 
+                    // if (vect_shift_count == N_GF-1) begin
                     if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+                    // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
                         vect_shift_count <= 0;
                         addr_0 <= addr_0 + 1;
                     end
@@ -344,23 +366,11 @@ begin
         end
        
     end
-    if (FIELD == "P251") begin
-        if ((byte_next > 250 && shift_in)|| (i_prng_out[31:24] >250 && load_in)) begin
-            big_shift_reg_en <= 0;
-        end
-        else begin
-            big_shift_reg_en <= shift_in | load_in;
-        end
-    end
-    else begin
-        big_shift_reg_en <= shift_in | load_in;
-    end
+    big_shift_reg_en <= shift_in | load_in;
 end
 
 
-
-
-always@(state, i_start, i_prng_out_valid, vect_shift_count, count, count_row_block, big_shift_reg_en)
+always@(state, i_start, i_prng_out_valid, vect_shift_count, count, count_row_block, vs_count_tracker)
 begin
 
     case(state)
@@ -368,6 +378,7 @@ begin
     s_wait_start: begin
         load_in <= 0;
         o_prng_out_ready <= 0;
+        // big_shift_reg_en <= 0;
         if (i_start) begin
             wren_0 <= 0;
             o_start_prng <= 1;
@@ -380,6 +391,7 @@ begin
     s_stall_0: begin
         wren_0 <= 0;
         o_start_prng <= 0;
+        // big_shift_reg_en <= 0;
         if (i_prng_out_valid) begin
             load_in <= 1;
             o_prng_out_ready <= 1;
@@ -392,6 +404,7 @@ begin
     s_stall_1: begin
         wren_0 <= 0;
         o_start_prng <= 0;
+        // big_shift_reg_en <= 1;
         o_prng_out_ready <= 0;
         load_in <= 0;
         shift_in <= 1;
@@ -402,23 +415,23 @@ begin
         o_start_prng <= 0;
         load_in <= 0;
         shift_in <= 1;
+        // big_shift_reg_en <= 1;
         o_prng_out_ready <= 0;
-        if (big_shift_reg_en) begin
-            if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
-                wren_0 <= 1;
-            end
-            else begin
-                wren_0 <= 0;
-            end
+        // if (vect_shift_count == 7) begin
+        if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+        // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+            wren_0 <= 1;
         end
         else begin
             wren_0 <= 0;
         end
+        
     end
 
     s_update_shake_reg: begin
         o_start_prng <= 0;
         shift_in <= 0;
+        // big_shift_reg_en <= 1;
         if (i_prng_out_valid) begin
             load_in <= 1;
             o_prng_out_ready <= 1;
@@ -427,13 +440,10 @@ begin
             load_in <= 0;
             o_prng_out_ready <= 0;
         end
-        if (big_shift_reg_en) begin
-            if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
-                wren_0 <= 1;
-            end
-            else begin
-                wren_0 <= 0;
-            end
+        // if (vect_shift_count == 7) begin
+        if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+        // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+            wren_0 <= 1;
         end
         else begin
             wren_0 <= 0;
@@ -446,7 +456,12 @@ begin
         load_in <= 0;
         shift_in <= 0;
         o_prng_out_ready <= 0;
-        wren_0 <= 0;
+        // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+        //     wren_0 <= 1;
+        // end
+        // else begin
+            wren_0 <= 0;
+        // end
     
     end
 
@@ -454,29 +469,50 @@ begin
     s_wait_prng_out_valid: begin
         wren_0 <= 0;
         o_start_prng <= 0;
+        // big_shift_reg_en <= 0;
         if (i_prng_out_valid) begin
+            // if (count == 0) begin //testing
+            //     load_in <= 1;
+            //     shift_in <= 0;
+            // else begin
+            //     shift_in <= 1;
+            //     load_in <= 0;
+            // end
             load_in <= 1;
-            o_prng_out_ready <= 1;  
+            o_prng_out_ready <= 1;
+            // if (vect_shift_count == 7) begin
+            // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+            //     wren_0 <= 1;
+            // end
+            // else begin
+            //     wren_0 <= 0;
+            // end
+            
         end
         else begin
             load_in <= 0;
             o_prng_out_ready <= 0;
+
         end
+        // if (vect_shift_count == 7) begin
+        //     wren_0 <= 1;
+        // end
+        // else begin
+        //     wren_0 <= 0;
+        // end
 
     end
 
     s_stall_2: begin
+        // wren_0 <= 0;
         o_start_prng <= 0;
+        // big_shift_reg_en <= 1;
         o_prng_out_ready <= 0;
         load_in <= 0;
         shift_in <= 1;
-        if (big_shift_reg_en) begin
-            if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
-                wren_0 <= 1;
-            end
-            else begin
-                wren_0 <= 0;
-            end
+        if (vect_shift_count == N_GF-1 || ((vect_shift_count == N_GF-1-PAD_BITS/N_GF) && (count_row_block == MAT_ROW_SIZE/PROC_SIZE-1))) begin
+        // if (vect_shift_count == vs_count_tracker || ((vect_shift_count == vs_count_tracker-PAD_BITS/N_GF) && (count_row_block == MAT_COL_SIZE/PROC_SIZE-1))) begin
+            wren_0 <= 1;
         end
         else begin
             wren_0 <= 0;
@@ -498,6 +534,8 @@ begin
                 load_in <= 0;
                 shift_in <= 0;
                 o_prng_out_ready <= 0;
+                // big_shift_reg_en <= 0;
+
     end
     
     endcase

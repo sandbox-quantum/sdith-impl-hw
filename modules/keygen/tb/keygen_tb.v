@@ -11,7 +11,7 @@ module keygen_tb
 #(
 //    parameter FIELD = "GF256",
     parameter FIELD = "P251",
-    parameter PARAMETER_SET = "L3",
+    parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:
@@ -234,11 +234,26 @@ begin
     
     gen_h_start_time <= $time;
     
-    @(posedge DUT.done_wit)
-    $display("Time taken for SampleWitness =", ($time-start_time-5)/10 );
+    if (PARAMETER_SET == "L3" || PARAMETER_SET == "L5") begin
+        @(posedge DUT.done_wit)
+        $display("Time taken for SampleWitness =", ($time-start_time-5)/10 );
+        
+        
+        @(posedge DUT.done_gen_h)
+        $display("Time taken for Generate H =", ($time-gen_h_start_time)/10 );
+        
+    end
+    
+    if (PARAMETER_SET == "L1") begin
+        @(posedge DUT.done_gen_h)
+        $display("Time taken for Generate H =", ($time-gen_h_start_time)/10 );
+        
+        @(posedge DUT.done_wit)
+        $display("Time taken for SampleWitness =", ($time-start_time-5)/10 );         
+        
+    end
     
     mult_start_time = $time;
-    
     @(posedge DUT.done_mat_vec_mul)
     $display("Time taken for Poly Mult =", ($time-mult_start_time)/10 );
     

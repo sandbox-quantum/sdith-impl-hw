@@ -202,7 +202,7 @@ wire  [7:0]                   q_non_zero_pos;
 wire  [`CLOG2(WEIGHT)-1:0]    q_non_zero_pos_addr;
 wire                          q_non_zero_pos_rd;
 
-compute_Q #(.PARAMETER_SET(PARAMETER_SET), .WEIGHT(WEIGHT), .D(D))
+compute_Q #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .WEIGHT(WEIGHT), .D(D))
 COMP_Q 
 (
 .i_clk(i_clk),      
@@ -233,7 +233,7 @@ assign q_addr_int = i_q_rd? i_q_addr:
     wire                          q_non_zero_pos_rd_0;
     wire  done_q_0;
 
-    compute_Q #(.PARAMETER_SET(PARAMETER_SET), .WEIGHT(WEIGHT), .D(D))
+    compute_Q #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .WEIGHT(WEIGHT), .D(D))
     COMP_Q_0 
     (
     .i_clk(i_clk),      
@@ -272,7 +272,7 @@ wire done_p;
 assign start_p = done_q;
 // assign p_x = q0_x;
 
-compute_SP #(.PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("P"))
+compute_SP #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("P"))
 COMP_P 
 (
 .i_clk(i_clk),      
@@ -307,7 +307,7 @@ COMP_P
     // assign start_p = done_q_0;
     // assign p_x_0 = q0_0_x;
 
-    compute_SP #(.PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("P"))
+    compute_SP #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("P"))
     COMP_P_0 
     (
     .i_clk(i_clk),      
@@ -383,7 +383,7 @@ wire done_s;
 
 assign s_x = q1_x;
 
-compute_SP #(.PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("S"))
+compute_SP #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("S"))
 COMP_S 
 (
 .i_clk(i_clk),      
@@ -425,7 +425,7 @@ COMP_S
 
     // assign s_0_x = q1_0_x;
 
-    compute_SP #(.PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("S"))
+    compute_SP #(.FIELD(FIELD), .PARAMETER_SET(PARAMETER_SET), .M(M), .WEIGHT(WEIGHT), .D(D), .TYPE("S"))
     COMP_S_0 
     (
     .i_clk(i_clk),      

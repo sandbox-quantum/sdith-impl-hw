@@ -54,8 +54,8 @@ module gf_mul
     v_temp_rearrange[5] = v_temp[4];
     v_temp_rearrange[4] = v_temp[3] ^ dummy;
     v_temp_rearrange[3] = v_temp[2] ^ dummy;
-    v_temp_rearrange[2] = v_temp[1] ^ dummy;
-    v_temp_rearrange[1] = v_temp[0];
+    v_temp_rearrange[2] = v_temp[1]; 
+    v_temp_rearrange[1] = v_temp[0]^ dummy;
     v_temp_rearrange[0] = dummy;
     end
   endfunction

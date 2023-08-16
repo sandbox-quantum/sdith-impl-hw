@@ -188,7 +188,6 @@ else begin
     reg  pos_rd_x_2 =0;  
     wire done_sampling_2 =0;  
     wire pos_rd_2 =0;
-    wire pos_rd_2 = 0;
 
 end
 endgenerate

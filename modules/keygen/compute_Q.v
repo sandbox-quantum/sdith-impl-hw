@@ -9,7 +9,7 @@
 
 module compute_Q
 #(
-
+    parameter FIELD = "GF256",
     parameter PARAMETER_SET = "L5",
     
                                                     
@@ -66,9 +66,39 @@ assign data_0 = init ? 1 :
 
 assign data_1 = init? i_non_zero_pos: 
                 ((m0_addr_1 == 0 && (~sel_mem_reg)) || (m1_addr_1 == 0 && sel_mem_reg))?  mul_out: 
-                (q_0_reg ^ mul_out);
+                (add_q_0_mul_out);
+                // (q_0_reg ^ mul_out);
 
                 // (q_0 + mul_out)%251;
+
+wire [7:0] add_q_0_mul_out;
+
+generate
+        if (FIELD == "P251") begin 
+            p251_add 
+            P251_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(q_0_reg), 
+                .in_2(mul_out),
+    //            .done(done_dot_mul[i]), 
+                .out(add_q_0_mul_out) 
+            );
+        end
+        else begin 
+            gf_add 
+            GF_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(q_0_reg), 
+                .in_2(mul_out),
+    //            .done(done_dot_mul[i]), 
+                .out(add_q_0_mul_out) 
+            );
+        end
+endgenerate
 
 // assign o_q = q_1;
 
@@ -154,17 +184,43 @@ assign q_1 = sel_mem? m0_q_1: m1_q_1;
 assign mul_in_1 = update_addr_zero? mul_out_reg: q_1;
 assign mul_in_2 = i_non_zero_pos;
 
-// gf_mul #(.REG_IN(0), .REG_OUT(0))
-gf_mul #(.REG_IN(1), .REG_OUT(1))
-    GF_MULT 
-    (
-        .clk(i_clk), 
-        .start(start_mul), 
-        .in_1(mul_in_1), 
-        .in_2(mul_in_2),
-        .done(done_mul), 
-        .out(mul_out) 
-    );
+// gf_mul #(.REG_IN(1), .REG_OUT(1))
+//     GF_MULT 
+//     (
+//         .clk(i_clk), 
+//         .start(start_mul), 
+//         .in_1(mul_in_1), 
+//         .in_2(mul_in_2),
+//         .done(done_mul), 
+//         .out(mul_out) 
+//     );
+
+generate
+    if (FIELD == "P251") begin 
+        p251_mul #(.REG_IN(1), .REG_OUT(1))
+        P251_MULT 
+        (
+            .clk(i_clk), 
+            .start(start_mul), 
+            .in_1(mul_in_1), 
+            .in_2(mul_in_2),
+            .done(done_mul), 
+            .out(mul_out) 
+        );
+    end
+    else begin 
+        gf_mul #(.REG_IN(1), .REG_OUT(1))
+        GF_MULT 
+        (
+            .clk(i_clk), 
+            .start(start_mul), 
+            .in_1(mul_in_1), 
+            .in_2(mul_in_2),
+            .done(done_mul), 
+            .out(mul_out) 
+        );
+    end
+endgenerate
 
 // assign mul_out = (mul_in_1 * mul_in_2) % 251;
 // assign done_mul = start_mul;

@@ -9,7 +9,8 @@
 
 module gen_H_seq_tb
 #(
-
+    
+    parameter FIELD = "P251",
     parameter PARAMETER_SET = "L3",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
                                    (PARAMETER_SET == "L3")? 159:
@@ -43,7 +44,7 @@ module gen_H_seq_tb
     parameter MAT_SIZE = MAT_ROW_SIZE*MAT_COL_SIZE_BYTES,
     
     parameter MS = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES*8,
-    parameter SHAKE_SQUEEZE = MS + (32-MS%32)%32,
+    parameter SHAKE_SQUEEZE = 2*(MS + (32-MS%32)%32),
 
     parameter SEED_FILE = (PARAMETER_SET == "L1")? "SEED_H.mem":
                           (PARAMETER_SET == "L3")? "SEED_H_L3.mem":
@@ -80,7 +81,7 @@ wire [PROC_SIZE-1:0] o_h_out;
 wire          o_done;
 wire          prng_rd;
 
-gen_H_seq #(.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF), .SEED_FILE(SEED_FILE))
+gen_H_seq #(.FIELD(FIELD),.PARAMETER_SET(PARAMETER_SET), .N_GF(N_GF), .SEED_FILE(SEED_FILE))
 H_Matrix_Gen 
 (
 .i_clk(i_clk),      

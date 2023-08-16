@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module gf_mul_tb(
+module p251_add_sub_tb(
 
     );
     
@@ -29,19 +29,23 @@ reg start = 0;
 reg [7:0] in_1;
 reg [7:0] in_2;
 wire [7:0] out;
+reg i_add_sub = 1;
 wire done;
 
 
-gf_mul
+p251_add_sub
 DUT
 (
-    .clk(clk),
+    .i_clk(clk),
     .in_1(in_1),
     .in_2(in_2),
-    .start(start),
+    .i_start(start),
+    .i_add_sub(i_add_sub),
     .out(out),
-    .done(done)
+    .o_done(done)
 );
+ 
+integer i;
  
  initial
  begin
@@ -49,12 +53,37 @@ DUT
      in_1 <= 0;
      in_2 <= 0;
      #100
+     for (i =0; i < 256; i=i+1) 
+     begin
+        start <= 1;
+        in_1 <= i;
+        in_2 <= 250;
+        #10;
+     end
+     
      start <= 1;
-     in_1  <= 8'he9;
-     in_2  <= 8'h05;
+     in_1  <= 1;
+     in_2  <= 20;
+     
+     #10 
+     start <= 1;
+     in_1  <= 2;
+     in_2  <= 31;
+     
+     #10 
+     start <= 1;
+     in_1  <= 3;
+     in_2  <= 85;
+     
+      #10 
+     start <= 1;
+     in_1  <= 6;
+     in_2  <= 165;
+     
      
      #10 
      start <= 0;
+     $finish;
  
  end
  

@@ -25,9 +25,9 @@
 
 module hash_mem_interface_tb  #(
     parameter IO_WIDTH = 32, 
-    parameter DATA_IN_WIDTH = 128, //34*32,                                      
+    parameter DATA_IN_WIDTH = 2760, //34*32,                                      
     parameter DATA_OUT_WIDTH = 128,                                      
-    parameter MAX_RAM_DEPTH = DATA_IN_WIDTH/32                                       
+    parameter MAX_RAM_DEPTH = 1+DATA_IN_WIDTH/32                                       
                                       
   );
 
@@ -84,7 +84,7 @@ wire                                      o_done;
     
     i_start = 1'b1;
     i_output_length <=  DATA_OUT_WIDTH;
-    i_input_length <= DATA_IN_WIDTH;
+    i_input_length <= 2760;
     #10
     
     i_start = 1'b0;

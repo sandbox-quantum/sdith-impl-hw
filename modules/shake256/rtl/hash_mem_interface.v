@@ -28,6 +28,7 @@ module hash_mem_interface
     parameter SHAKE256 = (PARAMETER_SET == "L1")? 1'b0 : 1'b1,
     parameter IO_WIDTH = 32,
     parameter MAX_RAM_DEPTH = 16,
+    parameter FULL_BLOCK = SHAKE256? 1088: 1344,
     parameter MAX_MSG_SIZE = 8_388_608 //in bits, e.g., 1 MB= 8388608 bits
 )
 (
@@ -90,7 +91,7 @@ endgenerate
 
 
  assign shake_din = (sel_din == 1)? first_block:
-                    (sel_din == 2)? 1088: //second_block
+                    (sel_din == 2)? FULL_BLOCK: //1088: //second_block
                     (sel_din == 3)? 32'h80000000 | input_length_reg:
                                     data_in_le;
 
@@ -171,23 +172,23 @@ begin
 	    end  
 		
 		else if (h_state == h_load_shake) begin          
-                if ((h_addr == input_length[IO_WIDTH-1:`CLOG2(IO_WIDTH)] - 1) && (input_length <= 1088)) begin
+                if ((h_addr == input_length[IO_WIDTH-1:`CLOG2(IO_WIDTH)] - 1) && (input_length <= FULL_BLOCK)) begin
                     h_addr <= 0;
                     count_hash_input <= 0;
                     h_state <= h_stall;
                     done_hash_load <= 1'b1;
                 end
-                else if (((h_addr == input_length[IO_WIDTH-1:`CLOG2(IO_WIDTH)] + 1) && (input_length > 1088))) begin
+                else if (((h_addr == input_length[IO_WIDTH-1:`CLOG2(IO_WIDTH)] + 1) && (input_length > FULL_BLOCK))) begin
                     h_addr <= 0;
                     count_hash_input <= 0;
                     h_state <= h_wait_start;
                     done_hash_load <= 1'b1;
                 end
-                else if (count_hash_input == 1088/IO_WIDTH) begin
+                else if (count_hash_input == FULL_BLOCK/IO_WIDTH) begin
                         if (shake_din_ready) begin
                             h_state <= h_load_interm;
                             count_hash_input <= 0;
-                            input_length_reg <= input_length_reg - 1088;
+                            input_length_reg <= input_length_reg - FULL_BLOCK;
                         end
                 end
                 else begin
@@ -258,7 +259,7 @@ begin
      begin
         if (shake_din_ready) begin
            shake_din_valid <= 1'b1;
-           if (input_length_reg > 1088) begin
+           if (input_length_reg > FULL_BLOCK) begin
                sel_din <= 2;
            end
            else begin
@@ -289,7 +290,7 @@ begin
     begin
         if (shake_din_ready) begin
            shake_din_valid <= 1'b1;
-            if (input_length_reg < 1088) begin
+            if (input_length_reg < FULL_BLOCK) begin
                 sel_din <= 3;
             end
             else begin

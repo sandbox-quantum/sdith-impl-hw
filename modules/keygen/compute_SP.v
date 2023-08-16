@@ -9,7 +9,7 @@
 
 module compute_SP
 #(
-
+    parameter FIELD = "GF256",
     parameter PARAMETER_SET = "L1",
     
     parameter TYPE = "P",
@@ -105,17 +105,44 @@ wire [7:0] scalar;
 // reg [7:0] scalar_reg;
 wire done_scalar;
 
-// compute scalar
-gf_mul #(.REG_IN(0), .REG_OUT(1))
-    SCALAR_GEN
-    (
-        .clk(i_clk), 
-        .start(1), 
-        .in_1(lj_for_s), 
-        .in_2(i_x),
-        .done(), 
-        .out(scalar) 
-    );
+// // compute scalar
+// gf_mul #(.REG_IN(0), .REG_OUT(1))
+//     SCALAR_GEN
+//     (
+//         .clk(i_clk), 
+//         .start(1), 
+//         .in_1(lj_for_s), 
+//         .in_2(i_x),
+//         .done(), 
+//         .out(scalar) 
+//     );
+
+generate
+    if (FIELD == "P251") begin 
+        p251_mul #(.REG_IN(1), .REG_OUT(0))
+        SCALAR_GEN_P251_MULT 
+        (
+            .clk(i_clk), 
+            .start(1), 
+            .in_1(lj_for_s), 
+            .in_2(i_x),
+            .done(), 
+            .out(scalar) 
+        );
+    end
+    else begin 
+        gf_mul #(.REG_IN(0), .REG_OUT(1))
+        SCALAR_GEN_GF_MULT 
+        (
+            .clk(i_clk), 
+            .start(1), 
+            .in_1(lj_for_s), 
+            .in_2(i_x),
+            .done(), 
+            .out(scalar)  
+        );
+    end
+endgenerate
 
 
 // reg [`CLOG2(M+1)-1:0] f_poly_addr, f_poly_addr_reg;
@@ -157,16 +184,43 @@ assign  ts_mul_in_1 = (first)? 1 : temp_ts;
 assign  ts_mul_in_2 = i_reg;
 
 
-gf_mul #(.REG_IN(0), .REG_OUT(1))
-    REM_ONE_DEG_F_POLY
-    (
-        .clk(i_clk), 
-        .start(start_ts_mul), 
-        .in_1(ts_mul_in_1), 
-        .in_2(ts_mul_in_2),
-        .done(done_ts_mul), 
-        .out(ts_mul_out) 
-    );
+// gf_mul #(.REG_IN(0), .REG_OUT(1))
+//     REM_ONE_DEG_F_POLY
+//     (
+//         .clk(i_clk), 
+//         .start(start_ts_mul), 
+//         .in_1(ts_mul_in_1), 
+//         .in_2(ts_mul_in_2),
+//         .done(done_ts_mul), 
+//         .out(ts_mul_out) 
+//     );
+
+generate
+    if (FIELD == "P251") begin 
+        p251_mul #(.REG_IN(1), .REG_OUT(0))
+        REM_ONE_DEG_F_POLY_P251_MULT 
+        (
+            .clk(i_clk), 
+            .start(start_ts_mul), 
+            .in_1(ts_mul_in_1), 
+            .in_2(ts_mul_in_2),
+            .done(done_ts_mul), 
+            .out(ts_mul_out) 
+        );
+    end
+    else begin 
+        gf_mul #(.REG_IN(0), .REG_OUT(1))
+        REM_ONE_DEG_F_POLY_GF_MULT 
+        (
+            .clk(i_clk), 
+            .start(start_ts_mul), 
+            .in_1(ts_mul_in_1), 
+            .in_2(ts_mul_in_2),
+            .done(done_ts_mul), 
+            .out(ts_mul_out) 
+        );
+    end
+endgenerate
 
 wire [7:0] temp_ts;
 wire [7:0] temp_ts_reg;
@@ -174,7 +228,36 @@ wire [7:0] temp_ts_reg;
 // reg [7:0] temp_ts_reg_reg;
 // reg first_reg, first_reg_reg;
 wire first_reg, first_reg_reg;
-assign temp_ts = ts_mul_out ^ f_poly;
+// assign temp_ts = ts_mul_out ^ f_poly;
+assign temp_ts = add_ts_fpoly;
+
+wire [7:0] add_ts_fpoly;
+generate
+        if (FIELD == "P251") begin 
+            p251_add 
+            TS_FPOLY_P251_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(ts_mul_out), 
+                .in_2(f_poly),
+    //            .done(done_dot_mul[i]), 
+                .out(add_ts_fpoly) 
+            );
+        end
+        else begin 
+            gf_add 
+            TS_FPOLY_GF_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(ts_mul_out), 
+                .in_2(f_poly),
+    //            .done(done_dot_mul[i]), 
+                .out(add_ts_fpoly) 
+            );
+        end
+endgenerate
 
 pipeline_reg_gen #(.WIDTH(1), .REG_STAGES(2))
 FIRST_REG_STAGE
@@ -219,17 +302,46 @@ DONE_TS_MUL_REG_STAGE
 wire [7:0] s_mul_temp_ts;
 wire done_s_mul_ts;
 
-gf_mul #(.REG_IN(0), .REG_OUT(1))
-    TEMP_GF_MULT_S
-    (
-        .clk(i_clk), 
-        .start(done_ts_mul_reg), 
-        .in_1(scalar), 
-        // .in_2(first_reg_reg? 1 : temp_ts_reg_reg),
-        .in_2(first_reg? 1 : temp_ts_reg),
-        .done(done_s_mul_ts), 
-        .out(s_mul_temp_ts) 
-    );
+// gf_mul #(.REG_IN(0), .REG_OUT(1))
+//     TEMP_GF_MULT_S
+//     (
+//         .clk(i_clk), 
+//         .start(done_ts_mul_reg), 
+//         .in_1(scalar), 
+//         // .in_2(first_reg_reg? 1 : temp_ts_reg_reg),
+//         .in_2(first_reg? 1 : temp_ts_reg),
+//         .done(done_s_mul_ts), 
+//         .out(s_mul_temp_ts) 
+//     );
+
+generate
+    if (FIELD == "P251") begin 
+        p251_mul #(.REG_IN(1), .REG_OUT(0))
+        TEMP_P251_S 
+        (
+            .clk(i_clk), 
+            .start(done_ts_mul_reg), 
+            .in_1(scalar), 
+            // .in_2(first_reg_reg? 1 : temp_ts_reg_reg),
+            .in_2(first_reg? 1 : temp_ts_reg),
+            .done(done_s_mul_ts), 
+            .out(s_mul_temp_ts) 
+        );
+    end
+    else begin 
+        gf_mul #(.REG_IN(0), .REG_OUT(1))
+        TEMP_GF_MULT_S 
+        (
+            .clk(i_clk), 
+            .start(done_ts_mul_reg), 
+            .in_1(scalar), 
+            // .in_2(first_reg_reg? 1 : temp_ts_reg_reg),
+            .in_2(first_reg? 1 : temp_ts_reg),
+            .done(done_s_mul_ts), 
+            .out(s_mul_temp_ts) 
+        );
+    end
+endgenerate
 
 reg [`CLOG2(DEPTH_Q_FP + 1)-1:0] s_addr_0;
 wire [`CLOG2(DEPTH_Q_FP + 1)-1:0] s_addr_1;
@@ -237,7 +349,37 @@ wire [7:0] s_data_0, s_data_1;
 wire [7:0] s_q_0, s_q_1;
 wire s_wren_0, s_wren_1;
 
-assign s_data_0 = s_mul_temp_ts ^ s_q_1;
+// assign s_data_0 = s_mul_temp_ts ^ s_q_1;
+assign s_data_0 = add_s_mul_sq;
+
+wire [7:0] add_s_mul_sq;
+generate
+        if (FIELD == "P251") begin 
+            p251_add 
+            TS_FPOLY_P251_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(s_mul_temp_ts), 
+                .in_2(s_q_1),
+    //            .done(done_dot_mul[i]), 
+                .out(add_s_mul_sq) 
+            );
+        end
+        else begin 
+            gf_add 
+            TS_FPOLY_GF_ADD 
+            (
+    //            .clk(i_clk), 
+    //            .start(start_dot_mul), 
+                .in_1(s_mul_temp_ts), 
+                .in_2(s_q_1),
+    //            .done(done_dot_mul[i]), 
+                .out(add_s_mul_sq) 
+            );
+        end
+endgenerate
+
 assign s_wren_0 = done_s_mul_ts;
 assign s_addr_1 = i_sp_rd? i_sp_addr: f_poly_addr_reg;
 
