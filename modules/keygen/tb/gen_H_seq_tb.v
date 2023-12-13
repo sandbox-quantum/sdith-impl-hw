@@ -11,7 +11,8 @@ module gen_H_seq_tb
 #(
     
     parameter FIELD = "P251",
-    parameter PARAMETER_SET = "L3",
+//    parameter FIELD = "GF256",
+    parameter PARAMETER_SET = "L5",
     parameter MAT_ROW_SIZE_BYTES = (PARAMETER_SET == "L1")? 104:
                                    (PARAMETER_SET == "L3")? 159:
                                    (PARAMETER_SET == "L5")? 202:
@@ -26,7 +27,7 @@ module gen_H_seq_tb
                             (PARAMETER_SET == "L3")? 192:
                             (PARAMETER_SET == "L5")? 256:
                                                      128,
-    parameter N_GF = 8, 
+    parameter N_GF = 4, 
     
     parameter MAT_SIZE_BYTES = MAT_ROW_SIZE_BYTES*MAT_COL_SIZE_BYTES,
     

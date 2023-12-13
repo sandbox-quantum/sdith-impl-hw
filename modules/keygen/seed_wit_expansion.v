@@ -109,7 +109,7 @@ assign o_hash_output_length = 4096;
 
 wire [31:0] q_seed_wit;
 
-mem_single #(.WIDTH(32), .DEPTH(LAMBDA/32), .FILE(FILE_SEED)) 
+mem_single #(.WIDTH(32), .DEPTH(LAMBDA/32), .FILE(FILE_SEED), .INIT(1)) 
  SEED_WIT_MEM
  (
  .clock(i_clk),
@@ -138,7 +138,7 @@ end
 
 reg start_sampling;
 wire done_sampling;
-wire pos_rd;
+//wire pos_rd;
 reg pos_valid;
 sampling #(.PARAMETER_SET(PARAMETER_SET))
 SAMPLE_0 (
@@ -197,7 +197,7 @@ mem_single #(.WIDTH(8), .DEPTH(WEIGHT/D), .FILE(FILE_SEED))
  .q(o_val_0)
  );
 
- mem_dual #(.WIDTH(8), .DEPTH(M/D), .FILE("zero.mem")) 
+ mem_dual #(.WIDTH(8), .DEPTH(M/D), .INIT(1)) 
 X_MEM_2
  (
  .clock(i_clk),
@@ -250,7 +250,7 @@ reg  pos_rd_x;
 
 assign addr_x = {1'b0,pos_addr_x};
 
-mem_dual #(.WIDTH(8), .DEPTH(M/D), .FILE("zero.mem")) 
+mem_dual #(.WIDTH(8), .DEPTH(M/D), .INIT(1)) 
 X_MEM
  (
  .clock(i_clk),

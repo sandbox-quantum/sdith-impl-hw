@@ -14,7 +14,7 @@ module sign_offline
    parameter FIELD = "GF256",
 //     parameter FIELD = "P251",
 
-    parameter PARAMETER_SET = "L1",
+    parameter PARAMETER_SET = "L5",
     
     parameter LAMBDA =   (PARAMETER_SET == "L1")? 128:
                             (PARAMETER_SET == "L3")? 192:
@@ -43,8 +43,8 @@ module sign_offline
                                                1,
 
     parameter  TAU =    (PARAMETER_SET == "L1")? 17:
-                        (PARAMETER_SET == "L3")? 17: //check and update
-                        (PARAMETER_SET == "L5")? 17: //check and update
+                        (PARAMETER_SET == "L3")? 26: //check and update
+                        (PARAMETER_SET == "L5")? 34: //check and update
                                                17,
     
     parameter D_HYPERCUBE = 8,
@@ -103,7 +103,7 @@ module sign_offline
     input   [`CLOG2(Y_SIZE_ADJ/32)-1:0]                 i_y_addr,
     input                                               i_y_wr_en,
 
-    input   [32-1:0]                                    o_h1,
+    output  [32-1:0]                                    o_h1,
     input   [`CLOG2(2*SEED_SIZE/32)-1:0]                i_h1_addr,
     input                                               i_h1_rd_en,
 

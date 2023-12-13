@@ -9,7 +9,8 @@
 
 module compute_SP
 #(
-    parameter FIELD = "GF256",
+    parameter FIELD = "P251",
+//    parameter FIELD = "GF256",
     parameter PARAMETER_SET = "L1",
     
     parameter TYPE = "P",
@@ -17,17 +18,17 @@ module compute_SP
     parameter M  =  (PARAMETER_SET == "L1")? 230:
                     (PARAMETER_SET == "L3")? 352:
                     (PARAMETER_SET == "L5")? 480:
-                                             8,
+                                             230,
 
-    parameter WEIGHT =  (PARAMETER_SET == "L1")? 79:
-                        (PARAMETER_SET == "L3")? 120:
-                        (PARAMETER_SET == "L5")? 150:
-                                                    8,
+    parameter WEIGHT =  (PARAMETER_SET == "L1")?    79:
+                        (PARAMETER_SET == "L3")?    120:
+                        (PARAMETER_SET == "L5")?    150:
+                                                    79,
                                                             
-    parameter D =   (PARAMETER_SET == "L1")? 1:
-                    (PARAMETER_SET == "L3")? 2:
-                    (PARAMETER_SET == "L5")? 2:
-                                            1,
+    parameter D =   (PARAMETER_SET == "L1")?    1:
+                    (PARAMETER_SET == "L3")?    2:
+                    (PARAMETER_SET == "L5")?    2:
+                                                1,
                                             
     parameter DEPTH_Q_FP = (TYPE == "S")? M/D : WEIGHT/D 
 
@@ -383,7 +384,7 @@ endgenerate
 assign s_wren_0 = done_s_mul_ts;
 assign s_addr_1 = i_sp_rd? i_sp_addr: f_poly_addr_reg;
 
-mem_dual #(.WIDTH(8), .DEPTH(DEPTH_Q_FP), .FILE("zero.mem"))
+mem_dual #(.WIDTH(8), .DEPTH(DEPTH_Q_FP), .INIT(1))
 S_MEM 
 (
   .clock(i_clk),

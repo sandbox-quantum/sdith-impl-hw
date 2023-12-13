@@ -6,9 +6,9 @@
  *          
 */
 
-(* use_dsp = "no" *) module p251_mul
+(* use_dsp = "yes" *) module gf251_mul
 #(
-    parameter REG_IN = 1,
+    parameter REG_IN = 0,
     parameter REG_OUT = 1
 )
 (
@@ -67,10 +67,10 @@ endgenerate
 
 wire [7:0] red;
 wire red_done;
-p251_mul_red
+gf251_mul_red
 RED
 (
-    .i_clk(i_clk),
+    .i_clk(clk),
     .i_a(mul_reg),
     .i_start(done_reg_1),
     .o_c(red),

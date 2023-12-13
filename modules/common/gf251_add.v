@@ -6,13 +6,13 @@
  *          
 */
 
-(* use_dsp = "no" *) module p251_mul
+(* use_dsp = "yes" *) module gf251_add
 #(
-    parameter REG_IN = 1,
+    parameter REG_IN = 0,
     parameter REG_OUT = 1
 )
 (
-    input clk,
+    input i_clk,
     input start,
     input [7:0] in_1,
     input [7:0] in_2,
@@ -44,22 +44,22 @@ reg done_reg_1, done_reg_2;
 // end
 // endgenerate
 
-wire [15:0] mul;
-assign mul = in_1 * in_2;
+wire [8:0] add;
+assign add = in_1 + in_2;
 
-reg [15:0] mul_reg;
+reg [8:0] add_reg;
 generate
 if (REG_IN == 1) begin
-    always@(posedge clk)
+    always@(posedge i_clk)
     begin
-        mul_reg <= mul;
+        add_reg <= add;
         done_reg_1 <= start;
     end
 end
 else begin
-    always@(mul, start)
+    always@(add, start)
     begin
-        mul_reg <= mul;
+        add_reg <= add;
         done_reg_1 <= start;
     end
 end
@@ -67,11 +67,11 @@ endgenerate
 
 wire [7:0] red;
 wire red_done;
-p251_mul_red
+gf251_mul_red
 RED
 (
     .i_clk(i_clk),
-    .i_a(mul_reg),
+    .i_a({7'b0000000,add_reg}),
     .i_start(done_reg_1),
     .o_c(red),
     .o_done(red_done)
@@ -80,7 +80,7 @@ RED
 reg [7:0] red_reg;
 generate
 if (REG_OUT == 1) begin
-    always@(posedge clk)
+    always@(posedge i_clk)
     begin
         red_reg <= red;
         done_reg_2 <= red_done;

@@ -9,10 +9,10 @@
 
 module keygen 
 #(
-//    parameter FIELD = "GF256",
-    parameter FIELD = "P251",
+    parameter FIELD = "GF256",
+//    parameter FIELD = "P251",
 
-    parameter PARAMETER_SET = "L5",
+    parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:

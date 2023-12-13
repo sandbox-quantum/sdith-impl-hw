@@ -33,8 +33,8 @@ Output: c  = (in_1 + in_2) mod 251
 */
 module p251_add
 #(
-   parameter REG_IN = 0,
-   parameter REG_OUT = 0
+   parameter REG_IN = 1,
+   parameter REG_OUT = 1
 )
 (
     input i_clk, // for potential regs we may add later

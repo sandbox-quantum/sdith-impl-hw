@@ -10,7 +10,7 @@
 module samplewitness_tb
 #(
 
-    parameter PARAMETER_SET = "L3",
+    parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
                         (PARAMETER_SET == "L3")? 192:

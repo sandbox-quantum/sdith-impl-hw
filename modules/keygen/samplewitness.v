@@ -9,7 +9,7 @@
 
 module samplewitness 
 #(
-    parameter FIELD = "GF256",
+    parameter FIELD = "P251",
     parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
@@ -458,7 +458,7 @@ wire [7:0] s_mv_int;
 reg [7:0] s_mv_int_reg = 0;
 reg [`CLOG2(M)-1:0] s_mv_addr;
 wire [7:0] s_0, s_1;
-reg s_rd_int;
+//reg s_rd_int;
 reg sel_d, sel_d_reg;
 reg s_mv_wr_en;
 

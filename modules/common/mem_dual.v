@@ -4,7 +4,7 @@
  * Public domain.
  *
  */
-
+`include "clog2.v"
 module mem_dual
 #(
   parameter WIDTH = 8,

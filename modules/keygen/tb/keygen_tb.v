@@ -9,8 +9,8 @@
 
 module keygen_tb
 #(
-//    parameter FIELD = "GF256",
-    parameter FIELD = "P251",
+    parameter FIELD = "GF256",
+//    parameter FIELD = "P251",
     parameter PARAMETER_SET = "L1",
     
     parameter LAMBDA =  (PARAMETER_SET == "L1")? 128:
@@ -271,6 +271,7 @@ end
  always
  begin
      @(posedge o_done)
+     $writememb("H_L1.mem", DUT.H_Matrix_Gen.RESULT_MEM.mem);
      $writememb("HSA_L1.mem", DUT.MAT_VEC_MUL.RESULT_MEM.mem);
 //     $writememb("S_L3.mem", DUT.SAMP_WIT.COMP_S.S_MEM.mem);
 //     $writememb("S_L3.mem", DUT.SAMP_WIT.S_combined_MEM.mem);

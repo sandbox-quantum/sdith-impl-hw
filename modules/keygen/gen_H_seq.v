@@ -9,8 +9,9 @@
 
 module gen_H_seq
 #(
-    parameter FIELD = "GF256",
-    parameter PARAMETER_SET = "L3",
+    parameter FIELD = "P251",
+//    parameter FIELD = "GF256",
+    parameter PARAMETER_SET = "L5",
     
     parameter SEED_SIZE =   (PARAMETER_SET == "L1")? 128:
                             (PARAMETER_SET == "L3")? 192:
@@ -148,7 +149,7 @@ RESULT_MEM
 
 
 
-mem_single #(.WIDTH(32), .DEPTH(SEED_SIZE/32), .FILE(SEED_FILE))
+mem_single #(.WIDTH(32), .DEPTH(SEED_SIZE/32), .FILE())
 SEED_MEM 
 (
   .clock(i_clk),
@@ -273,10 +274,10 @@ begin
         end
 
         else if (state == s_update_shake_reg) begin
-            if (addr_0 == MAT_SIZE/PROC_SIZE) begin
-                addr_0 <= 0;
+            if (addr_0 == MAT_SIZE/PROC_SIZE) begin  // added && vect_shift_count == N_GF-1 to support last block filling
+//                addr_0 <= 0;
                 state <= s_done;
-                count <= 0;
+//                count <= 0;
             end
             else begin
                 if (i_prng_out_valid) begin
@@ -299,7 +300,12 @@ begin
         end
 
         else if (state == s_finish_storage) begin
-            state <= s_wait_prng_out_valid;
+            if (addr_0 == MAT_SIZE/PROC_SIZE) begin
+               state <= s_done;
+            end
+            else begin  
+                state <= s_wait_prng_out_valid;
+            end
         end
 
 
@@ -341,6 +347,8 @@ begin
             done_int <= 1;
             o_prng_force_done <= 1;
             last_block <=0;
+             addr_0 <= 0;
+             count <=  0;
         end
        
     end
@@ -360,7 +368,7 @@ end
 
 
 
-always@(state, i_start, i_prng_out_valid, vect_shift_count, count, count_row_block, big_shift_reg_en)
+always@(state, i_start, i_prng_out_valid, vect_shift_count, count, count_row_block, big_shift_reg_en, addr_0)
 begin
 
     case(state)
@@ -368,8 +376,9 @@ begin
     s_wait_start: begin
         load_in <= 0;
         o_prng_out_ready <= 0;
+         wren_0 <= 0;
         if (i_start) begin
-            wren_0 <= 0;
+//            wren_0 <= 0;
             o_start_prng <= 1;
         end
         else begin
@@ -446,7 +455,7 @@ begin
         load_in <= 0;
         shift_in <= 0;
         o_prng_out_ready <= 0;
-        wren_0 <= 0;
+        wren_0 <= 1;
     
     end
 
@@ -462,6 +471,7 @@ begin
             load_in <= 0;
             o_prng_out_ready <= 0;
         end
+        
 
     end
 

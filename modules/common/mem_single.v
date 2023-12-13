@@ -1,7 +1,8 @@
+`include "clog2.v"
 module mem_single
   #(
-    parameter WIDTH = 8,
-    parameter DEPTH = 64,
+    parameter WIDTH = 64,
+    parameter DEPTH = 65704,
     parameter FILE = "",
     parameter INIT = 0
   )

@@ -9,7 +9,7 @@
 
 module compute_Q
 #(
-    parameter FIELD = "GF256",
+    parameter FIELD = "P251",
     parameter PARAMETER_SET = "L5",
     
                                                     
@@ -255,7 +255,7 @@ assign m0_wren_0 = init? wren_0: (~sel_mem) & wren_0;
 // assign m0_wren_1 = init? wren_1: (~sel_mem) & wren_1;
 assign m0_wren_1 = init? wren_1: (~sel_mem_reg) & done_mul;
 
-mem_dual #(.WIDTH(8), .DEPTH(DEPTH_OF_Q+1), .FILE("zero.mem"))
+mem_dual #(.WIDTH(8), .DEPTH(DEPTH_OF_Q+1), .INIT(1))
 RESULT_MEM_0 
 (
   .clock(i_clk),
@@ -290,7 +290,7 @@ assign m1_wren_1 = init? wren_1: (sel_mem_reg) & done_mul;
 wire [8-1:0] m1_q_0;
 wire [8-1:0] m1_q_1;
 
-mem_dual #(.WIDTH(8), .DEPTH(DEPTH_OF_Q+1), .FILE("zero.mem"))
+mem_dual #(.WIDTH(8), .DEPTH(DEPTH_OF_Q+1), .INIT(1))
 RESULT_MEM_1 
 (
   .clock(i_clk),

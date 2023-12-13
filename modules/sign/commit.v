@@ -45,7 +45,7 @@ module commit
     parameter D_HYPERCUBE = 8,
     parameter ETA = 4,
 
-    parameter T =   (PARAMETER_SET == "L5")? 4:
+    parameter T =   (PARAMETER_SET == "L5")? 3: //test
                                              3, 
 
     parameter SEED_SIZE = LAMBDA,

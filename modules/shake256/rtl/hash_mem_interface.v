@@ -21,7 +21,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
 */
-
+`include "clog2.v"
 module hash_mem_interface
 #(
     parameter PARAMETER_SET = "L1",
