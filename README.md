@@ -49,6 +49,6 @@ We provide a makefile for easily gathering all files required for a specific tar
 
 # Requirements
 
-Please note that for running  run_xilinx_sim_keygen, run_xilinx_sim_sign, and run_xilinx_sim_verify you will need Xilinx Vivado installed on the machine and added to the path. 
+Please note that for running  run_amd_sim_keygen, run_amd_sim_sign, and run_amd_sim_verify you will need AMD (Xilinx) Vivado installed on the machine and added to the path. 
 
  
