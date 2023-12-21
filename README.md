@@ -31,7 +31,6 @@ The **module** folder consists of our hardware implementation. It contains follo
 - **verify** - contains signature verification related verilog files, tcl script, testbench, and a python script for aligning the input to our hardware keygen module
 - **common** - contains verilog files that are common among key generation, signature generation and signature verification modules
 
-
 # Makefile
 
 We provide a makefile for easily gathering all files required for a specific target module. 
@@ -49,6 +48,16 @@ We provide a makefile for easily gathering all files required for a specific tar
 
 # Requirements
 
-Please note that for running  run_amd_sim_keygen, run_amd_sim_sign, and run_amd_sim_verify you will need AMD (Xilinx) Vivado installed on the machine and added to the path. 
+Please note that for running  run_amd_sim_keygen, run_amd_sim_sign, and run_amd_sim_verify you will need AMD (Xilinx) Vivado installed on the machine and added to the path.
 
- 
+# Contributions
+
+We refer you to the [ePrint]() and [publication]() for contact information and details for referencing in your own works.
+
+# Licence
+
+This repository is licenced under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+# Disclaimer
+
+The hardware or software are provided "as is" and SandboxAQ hereby disclaims all warranties, whether express, implied, statutory, or otherwise. SandboxAQ specifically disclaims, without limitation, all implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement, and all warranties arising from course of dealing, usage, or trade practice. SandboxAQ makes no warranty of any kind that the hardware or software, or any products or results of the use thereof, will meet any person's requirements, operate without interruption, achieve any intended result, be compatible or work with any software, system or other services, or be secure, accurate, complete, free of harmful code, or error free.
