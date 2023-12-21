@@ -1,11 +1,7 @@
-/*
- * This file is commit module which part of SDitH sign.
- *
- * Copyright (C) 2023
- * Authors: Sanjay Deshpande <sanjay.deshpande@sandboxquantum.com>
- *          
-*/
+// Copyright (c) SandboxAQ. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
+// This file is commit module which part of SDitH sign.
 
 module commit 
 #(
