@@ -56,7 +56,7 @@ We refer you to the [ePrint]() and [publication]() for contact information and d
 
 # Licence
 
-This repository is licenced under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+This repository is licenced under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Copyright (c) SandboxAQ. All rights reserved.
 
 # Disclaimer
 
