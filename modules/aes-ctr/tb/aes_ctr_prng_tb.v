@@ -1,8 +1,12 @@
 `timescale 1ns / 1ps
-// Copyright (c) SandboxAQ. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is the AES-CTR PRNG testbench
+ *
+ * Copyright (C) 2023
+ * Authors: Sanjay Deshpande <sanjay.deshpande@sandboxquantum.com>
+ *          
+*/
 
-//This file is the AES-CTR PRNG testbench
 
 module aes_ctr_prng_tb
 #(

@@ -1,7 +1,12 @@
-// Copyright (c) SandboxAQ. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is the PRNG module using AES-CTR mode
+ *
+ * Copyright (C) 2023
+ * Authors: Sanjay Deshpande <sanjay.deshpande@sandboxquantum.com>
+ *          
+*/
 
-// This file is the PRNG module using AES-CTR mode
+
 
 module aes_ctr_prng
 #(
