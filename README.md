@@ -1,5 +1,5 @@
 
-# Please note that the implementation provided in this repository is not final, and the final implementation will be updated soon.
+### Final version of the code is coming soon
 
 # Introduction
 
