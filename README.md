@@ -1,11 +1,13 @@
+
+# Please note that the implementation provided in this repository is not final, and the final implementation will be updated soon.
+
 # Introduction
 
 This repository consists of hardware implementation (in progress) of **Syndrome Decoding in the Head (SDitH)** Digital Signature Scheme (https://sdith.org/). 
 
 
 
-<!-- This hardware implementation is part of the research work published at **Conference Name**. -->
-
+<!-- This hardware implementation is part of the research work published at CHES2024. -->
 
 
 <!-- # Citation 
@@ -13,25 +15,29 @@ This repository consists of hardware implementation (in progress) of **Syndrome 
 We kindly request you to use the following citation if you use our design. 
 
 ```
-@inproceedings{deshpande2024sdith,
-  author={Sanjay Deshpande and James Howe and Dongze Yue and Jakub Szefer},
-  title={SDitH in Hardware},
+@article{deshpandesdith2024,
+  title={{SDitH} in {H}ardware},
+  journal={IACR Transactions on Cryptographic Hardware and Embedded Systems},
+  publisher={Ruhr-Universität Bochum},
+  volume={2024, Issue 2},
+  author={Sanjay Deshpande and James Howe and Jakub Szefer and Dongze Yue},
+  year={2024}
 }
 ``` -->
 
 
 
 
-# 'modules' folder 
+# 'modules' folder (Coming soon...)
 
-The **module** folder consists of our hardware implementation. It contains following subsections:
+The **module** folder consists of our hardware implementation. It contains the following subsections:
 
 - **keygen** - contains key generation related verilog files, tcl script, testbench, and a python script for aligning the input to our hardware keygen module
 - **sign** - contains signature generaion related verilog files, tcl script, testbench, and a python script for aligning the input to our hardware keygen module
 - **verify** - contains signature verification related verilog files, tcl script, testbench, and a python script for aligning the input to our hardware keygen module
 - **common** - contains verilog files that are common among key generation, signature generation and signature verification modules
 
-# Makefile
+# Makefile (Coming soon...)
 
 We provide a makefile for easily gathering all files required for a specific target module. 
 <!-- The makefile also has capability of simulating the modules using Xilinx Vivado.  -->
